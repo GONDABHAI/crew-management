@@ -1,0 +1,1611 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crew Management</title>
+<style>
+  :root { --bg:#f4f6fa; --card:#fff; --ink:#1c2433; --muted:#6b7588; --brand:#1d4ed8; --line:#e2e6ee; --err:#b42318; --ok:#067647; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--ink); }
+  header { background:var(--brand); color:#fff; padding:14px 20px; display:flex; align-items:center; gap:14px; }
+  header h1 { margin:0; font-size:1.25rem; flex:1; }
+  header button { background:rgba(255,255,255,.18); color:#fff; border:1px solid rgba(255,255,255,.5); border-radius:8px; padding:7px 14px; cursor:pointer; font-size:.95rem; }
+  main { max-width:1150px; margin:18px auto; padding:0 14px 40px; }
+  .view { display:none; } .view.active { display:block; }
+  .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:16px; }
+  .tile { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:26px 16px; text-align:center; cursor:pointer; font-size:1.1rem; font-weight:600; color:var(--brand); transition:.15s; }
+  .tile:hover { transform:translateY(-3px); box-shadow:0 6px 16px rgba(29,78,216,.15); border-color:var(--brand); }
+  .tile small { display:block; margin-top:6px; font-weight:400; color:var(--muted); font-size:.82rem; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px; margin-bottom:16px; }
+  .card h2 { margin:0 0 12px; font-size:1.1rem; }
+  .card h3 { margin:0 0 10px; font-size:.95rem; color:var(--brand); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; }
+  label { display:block; font-size:.78rem; color:var(--muted); margin-bottom:3px; }
+  input, select, textarea { width:100%; padding:8px 9px; border:1px solid #cfd6e4; border-radius:7px; font-size:.95rem; font-family:inherit; background:#fff; }
+  input[readonly] { background:#f0f3f9; }
+  textarea { min-height:110px; resize:vertical; }
+  input[type=text], input:not([type]), input[type=search], input[type=tel], textarea, td { text-transform:uppercase; }
+  input::placeholder, textarea::placeholder { text-transform:none; }
+  .group { border:1px solid var(--line); border-radius:10px; padding:10px; background:#fafbfe; }
+  .persons { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:10px; margin-top:12px; }
+  .g3 { display:grid; grid-template-columns:2fr 1.3fr 1fr; gap:8px; }
+  .btn { background:var(--brand); color:#fff; border:0; border-radius:8px; padding:9px 16px; font-size:.95rem; cursor:pointer; }
+  .btn.alt { background:#fff; color:var(--brand); border:1px solid var(--brand); }
+  .btn.red { background:#fff; color:var(--err); border:1px solid var(--err); }
+  .btn.sm { padding:5px 10px; font-size:.85rem; }
+  .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; align-items:center; }
+  .wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:.92rem; }
+  th, td { text-align:left; padding:7px 8px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  th { background:#f0f3f9; white-space:nowrap; }
+  td input { min-width:90px; }
+  tr.det td { background:#f7f9ff; }
+  .hidden { display:none !important; }
+  .msg { margin-top:10px; font-size:.93rem; } .msg.err { color:var(--err); } .msg.ok { color:var(--ok); }
+  .hint { font-size:.85rem; color:var(--muted); }
+  code { background:#eef1f6; padding:2px 6px; border-radius:4px; }
+  .drop { border:2px dashed #aab4c8; border-radius:10px; padding:26px 14px; text-align:center; color:var(--muted); }
+  .drop.over { border-color:var(--brand); background:#eef3ff; }
+  input[type=file] { display:none; }
+  .diff { font-weight:600; padding-top:8px; }
+  .chk { display:flex; align-items:center; gap:8px; font-size:.95rem; color:var(--ink); border:1px solid var(--line); border-radius:8px; padding:9px 10px; background:#fafbfe; margin:0; cursor:pointer; }
+  .chk input { width:auto; margin:0; }
+  .tcell { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .tcell input { min-width:110px; }
+  @media (max-width:640px) {
+    main { padding:0 8px 30px; }
+    #mvTable thead { display:none; }
+    #mvTable, #mvTable tbody { display:block; width:100%; }
+    #mvTable tr.mvr { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:10px 8px 0; margin-top:10px; background:#f7f9ff; border:1px solid var(--line); border-bottom:0; border-radius:10px 10px 0 0; }
+    #mvTable tr.mvrem { display:block; padding:6px 8px 10px; background:#f7f9ff; border:1px solid var(--line); border-top:0; border-radius:0 0 10px 10px; }
+    #mvTable td { display:block; border:0; padding:0; min-width:0; }
+    #mvTable tr.mvr td:nth-child(1) { order:0; grid-column:1; font-weight:700; align-self:center; }
+    #mvTable tr.mvr td:nth-child(6) { order:1; grid-column:2; text-align:right; }
+    #mvTable tr.mvr td:nth-child(2) { order:2; } #mvTable tr.mvr td:nth-child(3) { order:3; }
+    #mvTable tr.mvr td:nth-child(4) { order:4; } #mvTable tr.mvr td:nth-child(5) { order:5; }
+    #mvTable tr.mvr td[data-l]::before { content:attr(data-l); display:block; font-size:.78rem; color:var(--muted); margin-bottom:3px; }
+    #mvTable tr.mvrem td:first-child { display:none; }
+    #stTable thead { display:none; }
+    #stTable, #stTable tbody { display:block; width:100%; }
+    #stTable tr.str { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; padding:10px 8px 0; margin-top:10px; background:#f7f9ff; border:1px solid var(--line); border-bottom:0; border-radius:10px 10px 0 0; }
+    #stTable tr.stdb { display:block; padding:8px 8px 10px; background:#f7f9ff; border:1px solid var(--line); border-top:0; border-radius:0 0 10px 10px; }
+    #stTable tr.det { display:block; padding:8px; margin-top:-1px; background:#fff; border:1px solid var(--line); border-radius:10px; }
+    #stTable tr.det.hidden { display:none !important; }
+    #stTable td { display:block; border:0; padding:0; min-width:0; }
+    #stTable tr.str td:nth-child(1) { order:0; grid-column:1 / 3; font-weight:700; align-self:center; }
+    #stTable tr.str td:nth-child(5) { order:1; grid-column:3; text-align:right; }
+    #stTable tr.str td:nth-child(2) { order:2; }
+    #stTable tr.str td:nth-child(3) { order:3; } #stTable tr.str td:nth-child(4) { order:4; }
+    #stTable tr.str td[data-l]::before { content:attr(data-l); display:block; font-size:.78rem; color:var(--muted); margin-bottom:3px; }
+    #stTable tr.stdb td:first-child, #stTable tr.det td:first-child { display:none; }
+    #stTable tr.str td .stname { max-width:none; min-width:0; width:100%; box-sizing:border-box; }
+    #stTable tr.str input[type=time] { min-width:0; width:100%; box-sizing:border-box; padding:7px 3px; font-size:.78rem; }
+    #stTable tr.str td[data-l]::before { font-size:.72rem; }
+    #stTable tr.str input { font-size:.85rem; padding:7px 5px; }
+    #stTable tr.str input[type=time]::-webkit-calendar-picker-indicator { display:none; }
+    #stTable .tcell { flex-direction:column; align-items:stretch; gap:5px; }
+    #stTable .tcell .btn { width:100%; padding:5px 2px; font-size:.78rem; }
+    #stTable td input { min-width:0; }
+    #stTable .tcell input { flex:1 1 auto; min-width:0; }
+    #trainTable thead, #shuntTable thead { display:none; }
+    #trainTable, #trainTable tbody, #shuntTable, #shuntTable tbody { display:block; width:100%; }
+    #trainTable tr.sv, #shuntTable tr.sv { display:block; padding:10px; margin-top:10px; background:#f7f9ff; border:1px solid var(--line); border-radius:10px; }
+    #trainTable tr.sv td, #shuntTable tr.sv td { display:flex; justify-content:space-between; gap:10px; border:0; padding:3px 0; min-width:0 !important; white-space:normal; }
+    #trainTable tr.sv td[data-l]::before, #shuntTable tr.sv td[data-l]::before { content:attr(data-l); flex:0 0 34%; font-size:.78rem; color:var(--muted); }
+    #trainTable tr.sv td.svact, #shuntTable tr.sv td.svact { flex-wrap:wrap; gap:6px; justify-content:flex-start; padding-top:8px; }
+    #trainTable .svact .btn, #shuntTable .svact .btn { margin:0; }
+    #shuntTable tr.det { display:block; padding:8px; margin-top:-1px; background:#fff; border:1px solid var(--line); border-radius:10px; }
+    #shuntTable tr.det.hidden { display:none !important; }
+    #shuntTable tr.det td { display:block; border:0; padding:0; overflow-x:auto; }
+    #mvTable td input { min-width:0; }
+    #mvTable .tcell { flex-wrap:nowrap; }
+    #mvTable .tcell input { flex:1 1 auto; min-width:0; }
+    #mvTable .tcell .btn { flex:0 0 auto; }
+  }
+  .schrow { display:flex; flex-wrap:nowrap; gap:10px; align-items:flex-end; }
+  .schrow > div:first-child { flex:0 0 110px; }
+  .schrow > div:last-child { flex:1 1 auto; min-width:0; }
+  .schrow select { width:100%; min-width:0 !important; height:38px; box-sizing:border-box; }
+  .schrow .tcell { flex-wrap:nowrap; }
+  .schrow .tcell input { min-width:0; height:38px; box-sizing:border-box; }
+  .schrow > div > input { height:38px; box-sizing:border-box; }
+  .schrow .tcell .btn { height:38px; margin:0; white-space:nowrap; flex:0 0 auto; }
+  #stTable .stname { max-width:150px; min-width:110px; }
+  #stTable .tcell { flex-wrap:nowrap; }
+  #stTable .tcell input { min-width:90px; }
+  #stTable .tcell .btn { flex:0 0 auto; white-space:nowrap; }
+  #stTable tr.stdb td { border-bottom:0; padding-top:0; }
+  .pair { display:flex; flex-wrap:nowrap; gap:10px; align-items:flex-end; }
+  .pair > div { flex:1 1 0; min-width:0; }
+  .pair > div:first-child { flex:0 0 34%; }
+  .pair input[type=time] { padding:7px 4px; font-size:.85rem; }
+  .pair input[type=time]::-webkit-calendar-picker-indicator { display:none; }
+  .pair input { box-sizing:border-box; height:38px; min-width:0; }
+  .pair .tcell { flex-wrap:nowrap; }
+  .pair .tcell input { min-width:0; flex:1 1 auto; }
+  .pair .tcell .btn { flex:0 0 auto; height:38px; }
+  .editbar { background:#fff7e0; border:1px solid #f0c36d; color:#6b4a00; border-radius:8px; padding:8px 10px; margin:0 0 12px; font-size:.9rem; }
+  .svact { white-space:nowrap; }
+  .svact .btn { margin-right:6px; }
+  .rowx { display:flex; align-items:flex-end; gap:6px; }
+  .rowx > div { flex:1; }
+  .thumbs { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .thumb { position:relative; }
+  .thumb img { height:90px; width:auto; border-radius:8px; border:1px solid var(--line); display:block; }
+  .thumb button { position:absolute; top:3px; right:3px; background:#fff; border:1px solid var(--err); color:var(--err); border-radius:50%; width:22px; height:22px; cursor:pointer; line-height:1; padding:0; }
+  .photoBtn { display:inline-block; }
+  #camBox { position:fixed; inset:0; background:rgba(0,0,0,.92); z-index:9999; display:none; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:12px; }
+  #camBox.on { display:flex; }
+  #camVideo { max-width:100%; max-height:70vh; border-radius:10px; background:#000; }
+  #camBar { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  #camBar .btn { font-size:1rem; padding:11px 20px; }
+  #camTxt { color:#fff; font-size:.9rem; text-align:center; }
+  #camThumbs .thumb img { height:56px; }
+  #camBox.flash #camVideo { opacity:.35; }
+  .tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .tab { background:#fff; color:var(--brand); border:1px solid var(--brand); border-radius:8px; padding:9px 16px; font-size:.95rem; cursor:pointer; }
+  .tab.active { background:var(--brand); color:#fff; }
+
+  /* ---------- dark theme ---------- */
+  html.dark { color-scheme:dark; --bg:#0e131b; --card:#171e29; --ink:#e7ebf3; --muted:#9aa6ba; --brand:#4c8dff; --line:#2b3546; --err:#ff7a70; --ok:#4cd694; }
+  html.dark header { background:#1c3a8f; }
+  html.dark input, html.dark select, html.dark textarea { background:#0f1621; color:var(--ink); border-color:#3a475b; }
+  html.dark input[readonly] { background:#1a2332; }
+  html.dark input::placeholder, html.dark textarea::placeholder { color:#6f7c91; }
+  html.dark .group, html.dark .chk { background:#121a26; }
+  html.dark th { background:#202b3b; }
+  html.dark tr.det td { background:#121a26; }
+  html.dark code { background:#232e3f; }
+  html.dark .drop { border-color:#3a475b; }
+  html.dark .drop.over { background:#16233a; }
+  html.dark .btn { color:#fff; }
+  html.dark .btn.alt, html.dark .tab { background:transparent; color:var(--brand); }
+  html.dark .btn.red { background:transparent; color:var(--err); }
+  html.dark .tab.active { background:var(--brand); color:#fff; }
+  html.dark .tile:hover { box-shadow:0 6px 16px rgba(76,141,255,.25); }
+  html.dark .thumb button { background:#171e29; }
+  html.dark .editbar { background:#3a2f12; border-color:#8a6d1f; color:#f3d98b; }
+  html.dark #camBar .btn.red { background:#fff !important; color:#b42318; }
+  html.dark #mvTable tr.mvr, html.dark #mvTable tr.mvrem, html.dark #stTable tr.str, html.dark #stTable tr.stdb,
+  html.dark #trainTable tr.sv, html.dark #shuntTable tr.sv { background:#121a26; }
+  html.dark #stTable tr.det, html.dark #shuntTable tr.det { background:#171e29; }
+  html.dark [id$="_stmt"] { background:#16233a !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Crew Management</h1>
+  <span id="saveStat" class="hint" style="color:#fff;opacity:.85;margin:0"></span>
+  <button id="themeBtn" type="button">&#127769; Dark theme</button>
+  <button id="homeBtn" class="hidden" data-go="home">&#8592; Main Page</button>
+</header>
+
+<main>
+<!-- ============ MAIN PAGE ============ -->
+<section class="view active" id="v-home">
+  <div class="tiles">
+    <div class="tile" data-go="train">1) Train Movement<small>Log a train run</small></div>
+    <div class="tile" data-go="shunt">2) Shunting Movement<small>Log a shunting job</small></div>
+    <div class="tile" data-go="crew">3) Upload Crew Details<small>Excel: Name, CUG, ID</small></div>
+    <div class="tile" data-go="routes">4) Add Routes<small>Routes and their stations</small></div>
+    <div class="tile" data-go="staff">5) Shunting Staff<small>Add or remove staff</small></div>
+  </div>
+</section>
+
+<!-- ============ 1. TRAIN MOVEMENT ============ -->
+<section class="view" id="v-train">
+  <div class="card">
+    <h2>Train Movement</h2>
+    <div id="trainEditBar" class="editbar hidden">&#9998; Editing a saved record. Change what you need, then press <b>Update Train Movement</b>.</div>
+    <div class="grid">
+      <div><label>Date</label><input id="t_date" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" data-date="1"></div>
+      <div><label>Sign On</label><input type="time" id="t_signon"></div>
+    </div>
+    <div class="persons" id="persons"></div>
+  </div>
+
+  <div class="card">
+    <h3>Loco details</h3>
+    <div class="grid">
+      <div><label>Loco No.</label><input id="t_loco" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
+      <div><label>Shed</label><input id="t_shed"></div>
+      <div class="schrow" style="grid-column:1/-1"><div><label>Schedule Done</label><select id="t_sdoneK" style="min-width:90px"><option value="">-- TYPE --</option><option>TI</option><option>IA</option><option>IB</option><option>IC</option><option>TOH</option><option>IOH</option><option>POH</option></select></div><div><label>Schedule Done Date</label><div class="tcell"><input id="t_sdone" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" data-date="1"></div></div></div>
+      <div class="schrow" style="grid-column:1/-1"><div><label>Schedule Due</label><select id="t_sdueK" style="min-width:90px"><option value="">-- TYPE --</option><option>TI</option><option>IA</option><option>IB</option><option>IC</option><option>TOH</option><option>IOH</option><option>POH</option></select></div><div><label>Schedule Due Date</label><div class="tcell"><input id="t_sdue" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" data-date="1"><button type="button" class="btn alt sm" data-duecalc="t_" title="Auto calculate (only when Done and Due type are the same): TI 45, IA 90, IB 180, IC 270 days">Auto</button></div></div></div>
+      <div><label>CTO (time)</label><input type="time" id="t_cto"></div>
+      <div><label>Line No.</label><input id="t_line" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Train details</h3>
+    <div class="grid">
+      <div><label>Train</label><input id="t_train"></div>
+      <div><label>BPC</label><input id="t_bpc" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
+      <div class="schrow" style="grid-column:1/-1">
+        <div><label>Authority</label>
+          <select id="t_auth"><option value="T409">T409</option><option value="T806">T806</option><option value="Other">Other</option></select>
+        </div>
+        <div><label>No.</label><input id="t_formno" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
+      </div>
+      <div id="authOtherBox" class="hidden" style="grid-column:1/-1"><label>Authority (other)</label><input id="t_authOther"></div>
+      <div id="moreAuth" style="grid-column:1/-1"></div>
+      <div style="grid-column:1/-1"><button type="button" class="btn alt sm" id="addAuth">+ Add more authority</button></div>
+      <div style="grid-column:1/-1"><label>Route Select</label><select id="t_route"></select></div>
+    </div>
+    <div id="t806Box" class="group hidden" style="margin-top:12px">
+      <h3>T806 details</h3>
+      <div class="grid">
+        <div><label>Start Time</label><input type="time" id="t_t8start"></div>
+        <div><label>End Time</label><input type="time" id="t_t8end"></div>
+        <div><label>Diff (Start &rarr; End)</label><div class="diff" id="t8diff"></div></div>
+      </div>
+      <div class="wrap" style="margin-top:12px"><table>
+        <thead><tr><th>#</th><th>Block Back / Block Forward</th><th>Station</th><th>No.</th><th></th></tr></thead>
+        <tbody id="blkBody"></tbody>
+      </table></div>
+      <div class="actions"><button type="button" class="btn alt sm" id="addBlk">+ Add more</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Stations</h3>
+    <div class="wrap">
+      <table id="stTable">
+        <thead><tr><th>#</th><th>Station Name</th><th>ARR</th><th>DEP</th><th></th></tr></thead>
+        <tbody id="stBody"></tbody>
+      </table>
+    </div>
+    <p id="stEmpty" class="hint">Select a route above, or add stations manually.</p>
+    <div class="actions"><button type="button" class="btn alt sm" id="addStation">+ Add station</button>
+      <span class="hint">Click an empty ARR / DEP box to fill the current time.</span></div>
+  </div>
+
+  <div class="card">
+    <h3>Fuel</h3>
+    <div class="grid">
+      <div><label>Fuel T/O</label><input type="number" step="any" inputmode="decimal" id="t_fto"></div>
+      <div><label>Fuel H/O</label><input type="number" step="any" inputmode="decimal" id="t_fho"></div>
+      <div><label>Consumption (T/O &minus; H/O)</label><input id="t_cons" readonly></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Shutdown / Secured or Handover</h3>
+    <div id="te_box"></div>
+    <div class="actions">
+      <button class="btn" id="saveTrain">Save Train Movement</button>
+      <button class="btn alt" id="resetTrain">Reset form</button>
+    </div>
+    <div id="trainMsg" class="msg"></div>
+  </div>
+
+  <div class="card">
+    <h2>Saved Train Movements</h2>
+    <div class="actions" style="margin:0 0 10px"><button class="btn alt sm" id="expTrain">Download Excel</button></div>
+    <div class="wrap"><table id="trainTable">
+      <thead><tr><th>Date</th><th>Train</th><th>Loco</th><th>LP</th><th>Authority</th><th>Route</th><th>Stations</th><th>Consumption</th><th>End of duty</th><th></th></tr></thead>
+      <tbody id="trainList"></tbody></table></div>
+  </div>
+</section>
+
+<!-- ============ 2. SHUNTING MOVEMENT ============ -->
+<section class="view" id="v-shunt">
+  <div class="card">
+    <h2>Shunting Movement</h2>
+    <div id="shuntEditBar" class="editbar hidden">&#9998; Editing a saved record. Change what you need, then press <b>Update Shunting Movement</b>.</div>
+    <div class="grid">
+      <div><label>Date</label><input id="s_date" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" data-date="1"></div>
+      <div><label>Shift</label>
+        <select id="s_shift"><option value="">-- Select --</option><option value="7-15">7 - 15</option><option value="15-23">15 - 23</option><option value="23-7">23 - 7</option></select></div>
+      <div><label>Sign On</label><input type="time" id="s_signon"></div>
+      <div><label>Shunting Master</label><input id="s_master" list="staffList" autocomplete="off"></div>
+      <div><label>Pointsman 1</label><input id="s_pm1" list="staffList" autocomplete="off"></div>
+      <div><label>Pointsman 2</label><input id="s_pm2" list="staffList" autocomplete="off"></div>
+    </div>
+    <div id="s_more" class="grid" style="margin-top:10px"></div>
+    <div class="actions" style="margin-top:10px"><button type="button" class="btn alt sm" id="addPm">+ Add more staff (Master, Pointsman 1, Pointsman 2)</button>
+      <span class="hint">Each click adds another Shunting Master, Pointsman 1 and Pointsman 2. Names come from the Shunting Staff list, or type any name.</span></div>
+  </div>
+
+  <div class="card">
+    <div class="grid">
+      <div><label>Train</label><input id="s_train"></div>
+      <div><label>Loco No.</label><input id="s_loco" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
+      <div><label>Shed</label><input id="s_shed"></div>
+      <div class="schrow" style="grid-column:1/-1"><div><label>Schedule Done</label><select id="s_sdoneK" style="min-width:90px"><option value="">-- TYPE --</option><option>TI</option><option>IA</option><option>IB</option><option>IC</option><option>TOH</option><option>IOH</option><option>POH</option></select></div><div><label>Schedule Done Date</label><div class="tcell"><input id="s_sdone" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" data-date="1"></div></div></div>
+      <div class="schrow" style="grid-column:1/-1"><div><label>Schedule Due</label><select id="s_sdueK" style="min-width:90px"><option value="">-- TYPE --</option><option>TI</option><option>IA</option><option>IB</option><option>IC</option><option>TOH</option><option>IOH</option><option>POH</option></select></div><div><label>Schedule Due Date</label><div class="tcell"><input id="s_sdue" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" data-date="1"><button type="button" class="btn alt sm" data-duecalc="s_" title="Auto calculate (only when Done and Due type are the same): TI 45, IA 90, IB 180, IC 270 days">Auto</button></div></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Movement Photo</h3>
+    <button type="button" class="btn sm" data-cam="m">&#128247; Capture photo (live)</button>
+    <label class="btn alt sm photoBtn" for="s_mphoto" style="color:var(--brand)">Add from gallery</label>
+    <input type="file" id="s_mphoto" accept="image/*" multiple>
+    <div class="thumbs" id="mPrev"></div>
+  </div>
+
+  <div class="card">
+    <h3>Movement Table</h3>
+    <div class="wrap"><table id="mvTable">
+      <thead><tr><th>#</th><th>Line / SH</th><th>ARR</th><th>Line / SH</th><th>DEP</th><th></th></tr></thead>
+      <tbody id="mvBody"></tbody>
+    </table></div>
+    <div class="actions"><button type="button" class="btn alt sm" id="addMv">+ Add more</button>
+      <span class="hint">Click an empty time box (or tap <b>Now</b>) to fill the current time.</span></div>
+  </div>
+
+  <div class="card">
+    <h3>Shutdown / Secured or Handover</h3>
+    <div id="se_box"></div>
+    <div class="actions">
+      <button class="btn" id="saveShunt">Save Shunting Movement</button>
+      <button class="btn alt" id="resetShunt">Reset form</button>
+    </div>
+    <div id="shuntMsg" class="msg"></div>
+  </div>
+
+  <div class="card">
+    <h2>Saved Shunting Movements</h2>
+    <div class="actions" style="margin:0 0 10px"><button class="btn alt sm" id="expShunt">Download Excel</button></div>
+    <div class="wrap"><table id="shuntTable">
+      <thead><tr><th>Date</th><th>Shift</th><th>Train</th><th>Loco</th><th>Shunting Master</th><th>Movements</th><th>End of duty</th><th></th></tr></thead>
+      <tbody id="shuntList"></tbody></table></div>
+  </div>
+</section>
+
+<!-- ============ 3. UPLOAD CREW ============ -->
+<section class="view" id="v-crew">
+  <div class="card">
+    <h2>Upload Crew Details</h2>
+    <div class="tabs" id="crewTabs">
+      <button type="button" class="tab active" data-cat="lp">1) LP Details</button>
+      <button type="button" class="tab" data-cat="alp">2) ALP Details</button>
+      <button type="button" class="tab" data-cat="tm">3) TM Details</button>
+    </div>
+    <h3 id="crewTitle">Upload LP Details</h3>
+    <div class="drop" id="drop">
+      <p>Drag &amp; drop an Excel file here, or</p>
+      <label class="btn" for="file" style="display:inline-block;color:#fff;margin:0" id="uploadLbl">Upload LP Details</label>
+      <input type="file" id="file" accept=".xlsx,.xls,.xlsm">
+      <div id="fname" class="hint"></div>
+    </div>
+    <p class="hint">Excel file (.xlsx / .xls) with columns in the order <code>NAME | CUG | ID</code>. First sheet is read; a header row is optional. New uploads are <b>added</b> to the saved list (nothing is deleted); a row with an already-saved ID just updates that person. LP, ALP and TM each keep their own list (saved in this browser); each list is used to autofill that role in Train Movement.</p>
+    <div id="crewMsg" class="msg"></div>
+  </div>
+  <div class="card">
+    <div class="actions" style="margin:0 0 10px">
+      <input type="search" id="crewQ" placeholder="Search crew…" style="max-width:320px">
+      <button class="btn alt sm" id="crewDl">Download Excel</button>
+      <button class="btn red sm" id="crewClear">Clear crew list</button>
+    </div>
+    <div id="crewCount" class="hint" style="margin-bottom:8px"></div>
+    <div class="wrap"><table>
+      <thead><tr><th>#</th><th>Name</th><th>CUG</th><th>ID</th></tr></thead>
+      <tbody id="crewBody"></tbody></table></div>
+  </div>
+</section>
+
+<!-- ============ 4. ADD ROUTES ============ -->
+<section class="view" id="v-routes">
+  <div class="card">
+    <h2>Add Route</h2>
+    <div class="grid" style="grid-template-columns:1fr">
+      <div><label>Route name (e.g. ABC &ndash; XYZ)</label><input id="r_name"></div>
+      <div><label>Stations in order (one per line, or comma separated)</label><textarea id="r_stations"></textarea></div>
+    </div>
+    <div class="actions"><button class="btn" id="saveRoute">Add Route</button></div>
+    <div id="routeMsg" class="msg"></div>
+  </div>
+  <div class="card">
+    <h2>Saved Routes</h2>
+    <div class="wrap"><table>
+      <thead><tr><th>Route</th><th>Stations</th><th></th></tr></thead>
+      <tbody id="routeList"></tbody></table></div>
+  </div>
+</section>
+
+<!-- ============ 5. SHUNTING STAFF ============ -->
+<section class="view" id="v-staff">
+  <div class="card">
+    <h2>Add Shunting Staff</h2>
+    <div class="grid">
+      <div><label>Name</label><input id="ss_name"></div>
+      <div><label>CUG</label><input id="ss_cug" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
+      <div><label>ID</label><input id="ss_id"></div>
+      <div><label>Designation</label><input id="ss_desig" placeholder="e.g. Shunting Master"></div>
+    </div>
+    <div class="actions"><button class="btn" id="saveStaff">Add Staff</button></div>
+    <div id="staffMsg" class="msg"></div>
+  </div>
+  <div class="card">
+    <h2>Shunting Staff List</h2>
+    <div class="wrap"><table>
+      <thead><tr><th>#</th><th>Name</th><th>CUG</th><th>ID</th><th>Designation</th><th></th></tr></thead>
+      <tbody id="staffBody"></tbody></table></div>
+  </div>
+</section>
+</main>
+
+<div id="camBox">
+  <div id="camTxt"></div>
+  <div id="camThumbs" class="thumbs" style="margin:0;justify-content:center;max-height:74px;overflow:hidden"></div>
+  <input type="file" id="camApp" accept="image/*" capture="environment">
+  <video id="camVideo" autoplay playsinline muted></video>
+  <div id="camBar">
+    <button type="button" class="btn" id="camShot">&#128247; Capture</button>
+    <button type="button" class="btn alt" id="camFlip">Switch camera</button>
+    <button type="button" class="btn red" id="camClose" style="background:#fff">Done</button>
+  </div>
+</div>
+<datalist id="crewList_lp"></datalist>
+<datalist id="crewList_alp"></datalist>
+<datalist id="crewList_tm"></datalist>
+<datalist id="staffList"></datalist>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  function load(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
+  function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+  function setTheme(d) {
+    document.documentElement.classList.toggle('dark', d);
+    $('themeBtn').textContent = d ? '\u2600 Light theme' : '\uD83C\uDF19 Dark theme';
+    try { localStorage.setItem('theme', d ? 'dark' : 'light'); } catch (e) {}
+  }
+  $('themeBtn').addEventListener('click', function () { setTheme(!document.documentElement.classList.contains('dark')); });
+  try { if (localStorage.getItem('theme') === 'dark') setTheme(true); } catch (e) {}
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function today() { var d = new Date(); return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear(); }
+  function sch(r, k) { var t = r[k + 'K'], d = r[k]; return t ? (t + ' - ' + (d || '')) : (d || ''); }
+  function fd(v) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v || ''); return m ? m[3] + '/' + m[2] + '/' + m[1] : (v || ''); }
+  function nowHM() { var d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  function diffMin(a, b) {
+    if (!a || !b) return null;
+    var x = a.split(':'), y = b.split(':');
+    var d = (+y[0] * 60 + +y[1]) - (+x[0] * 60 + +x[1]);
+    return d < 0 ? d + 1440 : d;
+  }
+  function diffTxt(a, b) { var d = diffMin(a, b); return d === null ? '' : d + ' min'; }
+  function setMsg(id, t, cls) { var m = $(id); m.textContent = t; m.className = 'msg ' + (cls || ''); }
+
+  var crew = load('crew3', null) || { lp: load('crew', []), alp: [], tm: [] }, cat = 'lp',
+      CN = { lp: 'LP', alp: 'ALP', tm: 'TM' }, routes = load('routes', []), staff = load('sstaff', []),
+      trains = load('trains', []), shunts = load('shunts2', []);
+  var st = [], xa = [], endPh = { te: [], se: [] };
+  var curView = 'home';
+  [trains, shunts].forEach(function (list) { list.forEach(function (r) { ['date', 'sdone', 'sdue'].forEach(function (f) { r[f] = fd(r[f]); }); (r.stations || []).forEach(function (x) { ['hLate', 'sLate'].forEach(function (k) { if (x[k] && /\D/.test(x[k])) x[k] = ''; }); }); }); });
+
+  /* ---------- navigation ---------- */
+  function show(v) {
+    document.querySelectorAll('.view').forEach(function (s) { s.classList.remove('active'); });
+    $('v-' + v).classList.add('active');
+    curView = v; queueSave();
+    $('homeBtn').classList.toggle('hidden', v === 'home');
+    if (v === 'train') { $('t_date').value = today(); refreshRouteSelect(); renderTrainList(); }
+    if (v === 'shunt') initShunt();
+    if (v === 'crew') renderCrew();
+    if (v === 'routes') renderRoutes();
+    if (v === 'staff') renderStaff();
+    window.scrollTo(0, 0);
+  }
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-go]');
+    if (el) show(el.getAttribute('data-go'));
+  });
+
+  function refreshLists() {
+    ['lp', 'alp', 'tm'].forEach(function (k) {
+      $('crewList_' + k).innerHTML = crew[k].map(function (c) { return '<option value="' + esc(c.name) + '">' + esc(c.id) + '</option>'; }).join('');
+    });
+    $('staffList').innerHTML = staff.map(function (s) { return '<option value="' + esc(s.name) + '">' + esc(s.id) + '</option>'; }).join('');
+  }
+
+  /* ---------- train movement: persons ---------- */
+  var P = [['lp', 'LP'], ['alp', 'ALP'], ['tm', 'TM']];
+  $('persons').innerHTML = P.map(function (p) {
+    return '<div class="group"><h3>' + p[1] + '</h3><div class="g3">' +
+      '<div><label>' + p[1] + ' Name</label><input id="' + p[0] + '_name" data-p="' + p[0] + '" list="crewList_' + p[0] + '" autocomplete="off"></div>' +
+      '<div><label>CUG</label><input id="' + p[0] + '_cug" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>' +
+      '<div><label>ID</label><input id="' + p[0] + '_id"></div></div></div>';
+  }).join('');
+
+  document.addEventListener('input', function (e) {
+    var p = e.target.getAttribute && e.target.getAttribute('data-p');
+    if (!p) return;
+    var v = e.target.value.trim().toLowerCase();
+    var m = crew[p].filter(function (c) { return c.name.toLowerCase() === v; })[0];
+    if (m) { $(p + '_cug').value = m.cug; $(p + '_id').value = m.id; }
+  });
+
+  $('t_auth').addEventListener('change', function () {
+    $('authOtherBox').classList.toggle('hidden', this.value !== 'Other');
+    updT806();
+  });
+  function t8Diff() { $('t8diff').textContent = diffTxt($('t_t8start').value, $('t_t8end').value); }
+  ['t_t8start', 't_t8end'].forEach(function (id) {
+    $(id).addEventListener('input', t8Diff); $(id).addEventListener('change', t8Diff);
+    $(id).addEventListener('focus', function () { if (!this.value) { this.value = nowHM(); t8Diff(); } });
+  });
+
+  /* block back / block forward rows */
+  var blocks = [];
+  function blankBlk(t) { return { type: t || 'Block Back', st: '', no: '' }; }
+  function resetBlocks() { blocks = [blankBlk('Block Back'), blankBlk('Block Forward')]; renderBlk(); }
+  function renderBlk() {
+    $('blkBody').innerHTML = blocks.map(function (b, i) {
+      var o = ['Block Back', 'Block Forward'].map(function (t) { return '<option' + (b.type === t ? ' selected' : '') + '>' + t + '</option>'; }).join('');
+      return '<tr><td>' + (i + 1) + '</td>' +
+        '<td><select data-i="' + i + '" data-f="type">' + o + '</select></td>' +
+        '<td><input data-i="' + i + '" data-f="st" value="' + esc(b.st) + '"></td>' +
+        '<td><input data-i="' + i + '" data-f="no" value="' + esc(b.no) + '"></td>' +
+        '<td><button type="button" class="btn red sm" data-bd="' + i + '">&#10005;</button></td></tr>';
+    }).join('');
+  }
+  function blkSet(e) { var t = e.target, i = t.getAttribute('data-i'); if (i !== null) blocks[+i][t.getAttribute('data-f')] = t.value; }
+  $('blkBody').addEventListener('input', blkSet);
+  $('blkBody').addEventListener('change', blkSet);
+  $('blkBody').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-bd]'); if (!b) return;
+    blocks.splice(+b.getAttribute('data-bd'), 1);
+    if (!blocks.length) blocks.push(blankBlk('Block Back'));
+    renderBlk();
+  });
+  $('addBlk').addEventListener('click', function () {
+    var last = blocks.length ? blocks[blocks.length - 1].type : 'Block Forward';
+    blocks.push(blankBlk(last === 'Block Back' ? 'Block Forward' : 'Block Back')); renderBlk();
+  });
+  function blkTxt(r, type) {
+    return (r.blocks || []).filter(function (b) { return b.type === type && (b.st || b.no); })
+      .map(function (b) { return b.st + (b.no ? ' (' + b.no + ')' : ''); }).join('; ');
+  }
+  resetBlocks();
+
+  function calcCons() {
+    var a = $('t_fto').value, b = $('t_fho').value;
+    $('t_cons').value = (a !== '' && b !== '') ? (Math.round((+a - +b) * 100) / 100) : '';
+  }
+  $('t_fto').addEventListener('input', calcCons);
+  $('t_fho').addEventListener('input', calcCons);
+
+  /* ---------- train movement: stations ---------- */
+  function blank(n) { return { name: n || '', arr: '', dep: '', hArr: '', hDep: '', hLate: '', sLate: '', cType: 'CRO', t1: '', t2: '' }; }
+  function refreshRouteSelect() {
+    var cur = $('t_route').value;
+    $('t_route').innerHTML = '<option value="">-- Select route --</option>' +
+      routes.map(function (r, i) { return '<option value="' + i + '">' + esc(r.name) + '</option>'; }).join('');
+    $('t_route').value = cur;
+  }
+  $('t_route').addEventListener('change', function () {
+    st = this.value === '' ? [] : routes[+this.value].stations.map(blank);
+    renderStations();
+  });
+  $('addStation').addEventListener('click', function () { st.push(blank('')); renderStations(); });
+
+  function fld(i, f, label, type) {
+    return '<div><label>' + label + '</label><input type="' + (type || 'time') + '" data-i="' + i + '" data-f="' + f + '" value="' + esc(st[i][f]) + '"></div>';
+  }
+  function spd(i, f, label) {
+    return '<div><label>' + label + ' (km/h)</label><input inputmode="numeric" pattern="[0-9]*" data-num="1" data-i="' + i + '" data-f="' + f + '" value="' + esc(st[i][f]) + '"></div>';
+  }
+  function cleanSpeed(x) { ['hLate', 'sLate'].forEach(function (k) { if (x[k] && /\D/.test(x[k])) x[k] = ''; }); }
+  function renderStations() {
+    st.forEach(cleanSpeed);
+    $('stEmpty').classList.toggle('hidden', st.length > 0);
+    $('stBody').innerHTML = st.map(function (s, i) {
+      var o = ['CRO', 'MRO', 'Other'].map(function (t) { return '<option' + (s.cType === t ? ' selected' : '') + '>' + t + '</option>'; }).join('');
+      function tm(f) { return '<div class="tcell"><input type="time" data-i="' + i + '" data-f="' + f + '" data-auto="1" value="' + esc(s[f]) + '"><button type="button" class="btn alt sm" data-fill="' + f + '">Auto fill</button></div>'; }
+      return '<tr class="str"><td>' + (i + 1) + '</td>' +
+        '<td data-l="Station Name"><input class="stname" data-i="' + i + '" data-f="name" value="' + esc(s.name) + '"></td>' +
+        '<td data-l="ARR">' + tm('arr') + '</td>' +
+        '<td data-l="DEP">' + tm('dep') + '</td>' +
+        '<td><button type="button" class="btn red sm" data-del="' + i + '">&#10005;</button></td></tr>' +
+        '<tr class="stdb"><td></td><td colspan="4"><button type="button" class="btn alt sm" data-tog="' + i + '">Detention &#9662;</button></td></tr>' +
+        '<tr class="det hidden" id="det' + i + '"><td></td><td colspan="4"><div class="grid">' +
+        fld(i, 'hArr', 'Home ARR') + fld(i, 'hDep', 'Home DEP') +
+        '<div><label>Diff (Home ARR &rarr; DEP)</label><div class="diff" id="hd' + i + '">' + diffTxt(s.hArr, s.hDep) + '</div></div>' +
+        spd(i, 'hLate', 'Home Late Off') + spd(i, 'sLate', 'Starter Late Off') +
+        '<div style="grid-column:1/-1;max-width:220px"><label>CRO / MRO / Etc</label><select data-i="' + i + '" data-f="cType">' + o + '</select></div>' +
+        fld(i, 't1', 'Time 1') + fld(i, 't2', 'Time 2') +
+        '<div><label>Time 2 &minus; Time 1</label><div class="diff" id="cd' + i + '">' + diffTxt(s.t1, s.t2) + '</div></div>' +
+        '</div></td></tr>';
+    }).join('');
+  }
+  function upd(i) {
+    var s = st[i];
+    $('hd' + i).textContent = diffTxt(s.hArr, s.hDep);
+    $('cd' + i).textContent = diffTxt(s.t1, s.t2);
+  }
+  $('stBody').addEventListener('input', function (e) {
+    var t = e.target, i = t.getAttribute('data-i');
+    if (i === null) return;
+    st[+i][t.getAttribute('data-f')] = t.value; upd(+i);
+  });
+  $('stBody').addEventListener('change', function (e) {
+    var t = e.target, i = t.getAttribute('data-i');
+    if (i === null) return;
+    st[+i][t.getAttribute('data-f')] = t.value; upd(+i);
+  });
+  $('stBody').addEventListener('focusin', function (e) {
+    var t = e.target;
+    if (t.getAttribute('data-auto') && !t.value) {
+      t.value = nowHM(); st[+t.getAttribute('data-i')][t.getAttribute('data-f')] = t.value;
+    }
+  });
+  $('stBody').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    var fl = b.getAttribute('data-fill');
+    if (fl) {
+      var inp = b.parentNode.querySelector('input'), ix = +inp.getAttribute('data-i');
+      inp.value = nowHM(); st[ix][fl] = inp.value; return;
+    }
+    var tg = b.getAttribute('data-tog'), dl = b.getAttribute('data-del');
+    if (tg !== null) $('det' + tg).classList.toggle('hidden');
+    if (dl !== null) { st.splice(+dl, 1); renderStations(); }
+  });
+
+  /* ---------- end of duty: SHUTDOWN / SECURED or HANDOVER (shared by Train and Shunting movement) ---------- */
+  var EK = [['a9', 'A9'], ['sa9', 'SA9'], ['hbpb', 'HB/PB'], ['ww4', 'WW APPLIED'], ['doors', 'ALL DOORS AND WINDOWS CLOSED'], ['batt', 'BATTERY OFF']];
+  var KEYS = [['bl', 'BL KEY'], ['rev', 'REVERSER KEY'], ['panto', 'PANTO KEY'], ['a9h', 'A9 HANDLE']];
+  var NUMA = 'inputmode="numeric" pattern="[0-9]*" data-num="1"';
+
+  function endHtml(x) {
+    function tm(id) { return '<div class="tcell"><input type="time" id="' + id + '"><button type="button" class="btn alt sm" data-endnow="' + id + '">Now</button></div>'; }
+    return '<div class="grid"><div><label>Select</label><select id="' + x + '_type">' +
+        '<option value="">-- SELECT --</option><option value="sd">1) SHUTDOWN / SECURED</option><option value="ho">2) HANDOVER</option></select></div></div>' +
+
+      '<div id="' + x + '_sd" class="group hidden" style="margin-top:12px"><h3>Shutdown / Secured</h3>' +
+        '<div class="grid">' +
+          '<div><label>Loco No.</label><input id="' + x + '_loco" ' + NUMA + '></div>' +
+          '<div><label>Train No.</label><input id="' + x + '_train"></div>' +
+          '<div class="pair" style="grid-column:1/-1"><div><label>Shutdown and secured on (Line No.)</label><input id="' + x + '_line" ' + NUMA + '></div>' +
+          '<div><label>At (time)</label>' + tm(x + '_time') + '</div></div>' +
+        '</div>' +
+        '<div class="actions" style="margin:14px 0 8px"><b>Checklist</b>' +
+          '<button type="button" class="btn alt sm" data-endall="' + x + '">Auto fill (tick all)</button>' +
+          '<button type="button" class="btn red sm" data-endclr="' + x + '">Clear all</button></div>' +
+        '<div class="grid">' + EK.map(function (c) {
+          if (c[0] === 'ww4') return '<label class="chk"><input id="' + x + '_wwn" ' + NUMA + ' maxlength="3" placeholder="NO." style="width:72px;text-align:center"> WW APPLIED</label>';
+          return '<label class="chk"><input type="checkbox" checked id="' + x + '_c_' + c[0] + '"> ' + c[1] + '</label>';
+        }).join('') + '</div>' +
+        '<p class="hint" style="margin:14px 0 6px">All keys submitted:</p>' +
+        '<div class="grid">' + KEYS.map(function (c) { return '<label class="chk"><input type="checkbox" checked id="' + x + '_k_' + c[0] + '"> ' + c[1] + '</label>'; }).join('') + '</div>' +
+        '<div class="grid" style="margin-top:12px"><div><label>Keys submitted to (On Duty name)</label><input id="' + x + '_duty" list="staffList" autocomplete="off"></div></div>' +
+        '<div style="margin-top:14px"><b>Shutdown / Secured photo</b><div class="actions" style="margin:8px 0 0">' +
+          '<button type="button" class="btn sm" data-cam="' + x + '">&#128247; Capture photo</button>' +
+          '<label class="btn alt sm photoBtn" for="' + x + '_photo" style="color:var(--brand);margin:0">Add from gallery</label>' +
+          '<input type="file" id="' + x + '_photo" accept="image/*" multiple></div>' +
+          '<div class="thumbs" id="' + x + '_prev"></div></div>' +
+      '</div>' +
+
+      '<div id="' + x + '_ho" class="group hidden" style="margin-top:12px"><h3>Handover</h3>' +
+        '<p class="hint" style="margin:0 0 8px">Complete charge of loco and train given to:</p>' +
+        '<div class="grid">' +
+          '<div><label>Loco No.</label><input id="' + x + '_hloco" ' + NUMA + '></div>' +
+          '<div><label>Train No.</label><input id="' + x + '_htrain"></div>' +
+          '<div><label>Given to (LP Name)</label><input id="' + x + '_hlp" list="crewList_lp" autocomplete="off"></div>' +
+          '<div><label>ID</label><input id="' + x + '_hid"></div>' +
+          '<div><label>At (time)</label>' + tm(x + '_htime') + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<p id="' + x + '_stmt" class="hidden" style="margin:12px 0 0;padding:10px 12px;background:#eef3ff;border-left:4px solid var(--brand);border-radius:6px;font-size:.95rem"></p>';
+  }
+  var SYNC = {};
+  ['te', 'se'].forEach(function (x) {
+    var pre = x === 'te' ? 't_' : 's_';
+    SYNC[x] = [[x + '_loco', pre + 'loco'], [x + '_hloco', pre + 'loco'], [x + '_train', pre + 'train'], [x + '_htrain', pre + 'train']];
+  });
+  /* Loco No. / Train in Shutdown-Secured and Handover follow the Loco / Train typed above, until the user types in them */
+  function syncEnd(x) {
+    SYNC[x].forEach(function (m) { var el = $(m[0]), v = $(m[1]).value; if (el.dataset.man !== '1' && v) el.value = v; });
+  }
+  ['te', 'se'].forEach(function (x) {
+    $(x + '_box').innerHTML = endHtml(x);
+    $(x + '_type').addEventListener('change', function () { endShow(x); syncEnd(x); });
+    $(x + '_photo').addEventListener('change', function () { addPhotos(this, endPh[x], x + '_prev'); });
+    SYNC[x].forEach(function (m) {
+      $(m[0]).addEventListener('input', function (e) { if (e.isTrusted) { if (this.value) this.dataset.man = '1'; else delete this.dataset.man; } });
+      $(m[1]).addEventListener('input', function () { syncEnd(x); });
+    });
+  });
+  function endShow(x) {
+    var v = $(x + '_type').value;
+    $(x + '_sd').classList.toggle('hidden', v !== 'sd');
+    $(x + '_ho').classList.toggle('hidden', v !== 'ho');
+  }
+  function endGet(x) {
+    var o = { type: $(x + '_type').value, loco: $(x + '_loco').value, train: $(x + '_train').value, line: $(x + '_line').value, time: $(x + '_time').value,
+      duty: $(x + '_duty').value, hloco: $(x + '_hloco').value, htrain: $(x + '_htrain').value, hlp: $(x + '_hlp').value, hid: $(x + '_hid').value,
+      htime: $(x + '_htime').value, checks: {}, keys: {}, photos: endPh[x].slice() };
+    o.ww = $(x + '_wwn').value;
+    EK.forEach(function (c) { o.checks[c[0]] = c[0] === 'ww4' ? !!o.ww : $(x + '_c_' + c[0]).checked; });
+    KEYS.forEach(function (c) { o.keys[c[0]] = $(x + '_k_' + c[0]).checked; });
+    return o;
+  }
+  function endSet(x, o) {
+    (SYNC[x] || []).forEach(function (m) { delete $(m[0]).dataset.man; });
+    o = o || {};
+    endPh[x] = (o.photos || []).slice(); renderPrev(endPh[x], x + '_prev');
+    $(x + '_type').value = o.type || '';
+    ['loco', 'train', 'line', 'time', 'duty', 'hloco', 'htrain', 'hlp', 'hid', 'htime'].forEach(function (f) { $(x + '_' + f).value = (f === 'hid' ? (o.hid || o.hhq) : o[f]) || ''; });
+    $(x + '_wwn').value = o.ww || ((o.checks && o.checks.ww4) ? '4' : '');
+    EK.forEach(function (c) { if (c[0] !== 'ww4') $(x + '_c_' + c[0]).checked = o.checks ? !!o.checks[c[0]] : true; });
+    KEYS.forEach(function (c) { $(x + '_k_' + c[0]).checked = o.keys ? !!o.keys[c[0]] : true; });
+    endShow(x); endUpdate(x);
+  }
+  function endReset(x) { endSet(x, null); }
+  document.addEventListener('click', function (e) {
+    var n = e.target.closest('[data-endnow]');
+    if (n) { var el = $(n.getAttribute('data-endnow')); el.value = nowHM(); el.dispatchEvent(new Event('input', { bubbles: true })); return; }
+    var a = e.target.closest('[data-endall]');
+    if (a) { var x = a.getAttribute('data-endall'); EK.forEach(function (c) { if (c[0] !== 'ww4') $(x + '_c_' + c[0]).checked = true; }); KEYS.forEach(function (c) { $(x + '_k_' + c[0]).checked = true; }); return; }
+    var r = e.target.closest('[data-endclr]');
+    if (r) { var y = r.getAttribute('data-endclr'); $(y + '_wwn').value = ''; EK.forEach(function (c) { if (c[0] !== 'ww4') $(y + '_c_' + c[0]).checked = false; }); KEYS.forEach(function (c) { $(y + '_k_' + c[0]).checked = false; }); }
+  });
+  function endStatement(e) {
+    if (!e || !e.type) return '';
+    if (e.type === 'ho') {
+      var id = e.hid || e.hhq;
+      return 'Complete charge of Loco No. ' + (e.hloco || '-') + ', Train No. ' + (e.htrain || '-') + ' given to LP ' + (e.hlp || '-') +
+        (id ? ' (ID ' + id + ')' : '') + ' at ' + (e.htime || '-') + '.';
+    }
+    var ck = e.checks || {}, ky = e.keys || {};
+    var ww = e.ww || (ck.ww4 ? '4' : '');
+    var APPL = { sa9: 'SA9 APPLIED', hbpb: 'HB/PB APPLIED' };
+    var lab = function (c) { return APPL[c[0]] || c[1]; };
+    var rest = EK.filter(function (c) { return c[0] !== 'ww4'; });
+    var done = rest.filter(function (c) { return !!ck[c[0]]; }).map(lab);
+    var notDone = rest.filter(function (c) { return !ck[c[0]]; }).map(lab);
+    var wwTxt = ww ? ww + ' WW APPLIED' : '-WW APPLIED';
+    var gave = KEYS.filter(function (c) { return ky[c[0]]; }).map(function (c) { return c[1]; });
+    var miss = KEYS.filter(function (c) { return !ky[c[0]]; }).map(function (c) { return c[1]; });
+    var t = 'Loco No. ' + (e.loco || '-') + ', Train No. ' + (e.train || '-') + ' shutdown and secured on Line No. ' + (e.line || '-') + ' at ' + (e.time || '-') + '.';
+    if (done.length || ww) t += ' ' + done.concat([wwTxt]).join(', ') + '.';
+    if (notDone.length && (done.length || ww)) t += ' Not done: ' + notDone.join(', ') + '.';
+    if (gave.length === KEYS.length) t += ' All keys (' + gave.join(', ') + ') submitted to on duty ' + (e.duty || '-') + '.';
+    else if (gave.length) t += ' Keys submitted to on duty ' + (e.duty || '-') + ': ' + gave.join(', ') + '. Not submitted: ' + miss.join(', ') + '.';
+    else if (e.duty) t += ' Keys not yet submitted (on duty ' + e.duty + ').';
+    return t;
+  }
+  function endUpdate(x) {
+    var t = endStatement(endGet(x)), el = $(x + '_stmt');
+    el.textContent = t; el.classList.toggle('hidden', !t);
+  }
+  ['te', 'se'].forEach(function (x) {
+    var later = function () { setTimeout(function () { endUpdate(x); }, 0); };
+    $(x + '_box').addEventListener('input', later);
+    $(x + '_box').addEventListener('change', later);
+    $(x + '_box').addEventListener('click', later);
+  });
+
+  /* ---------- train movement: save / list / export ---------- */
+  var TF = ['date', 'signon', 'loco', 'shed', 'sdone', 'sdoneK', 'sdue', 'sdueK', 'cto', 'line', 'train', 'bpc', 'fto', 'fho',
+    'formno', 't8start', 't8end'];
+  var editT = null, editS = null, editRouteKeep = '';
+  function authText(r) {
+    var a = [(r.authority || '') + (r.formno ? ' (No. ' + r.formno + ')' : '')].concat((r.xa || []).map(function (x) { return (x.name || '') + (x.no ? ' (No. ' + x.no + ')' : ''); }));
+    return a.filter(function (v) { return v.trim(); }).join(', ');
+  }
+  function hasT806(r) { return r.authority === 'T806' || (r.xa || []).some(function (x) { return x.name === 'T806'; }); }
+  function formT806() { return $('t_auth').value === 'T806' || xa.some(function (x) { return x.a === 'T806'; }); }
+  function updT806() { $('t806Box').classList.toggle('hidden', !formT806()); }
+  function renderXA() {
+    $('moreAuth').innerHTML = xa.map(function (x, i) {
+      var o = ['T409', 'T806', 'Other'].map(function (t) { return '<option' + (x.a === t ? ' selected' : '') + '>' + t + '</option>'; }).join('');
+      return '<div class="group" style="margin-top:8px"><div class="grid"><div><label>Authority ' + (i + 2) + '</label><select data-xa="' + i + '" data-f="a">' + o + '</select></div>' +
+        '<div><label>No.</label><input inputmode="numeric" data-xa="' + i + '" data-f="no" value="' + esc(x.no) + '"></div>' +
+        (x.a === 'Other' ? '<div><label>Authority (other)</label><input data-xa="' + i + '" data-f="o" value="' + esc(x.o) + '"></div>' : '') +
+        '<div style="align-self:end"><button type="button" class="btn red sm" data-xadel="' + i + '">Remove</button></div></div></div>';
+    }).join('');
+    updT806();
+  }
+  $('addAuth').addEventListener('click', function () { xa.push({ a: 'T409', o: '', no: '' }); renderXA(); queueSave(); });
+  $('moreAuth').addEventListener('input', function (e) {
+    var t = e.target, i = t.getAttribute('data-xa'); if (i === null) return;
+    xa[+i][t.getAttribute('data-f')] = t.value; queueSave();
+  });
+  $('moreAuth').addEventListener('change', function (e) {
+    var t = e.target; if (t.getAttribute('data-f') === 'a') { renderXA(); queueSave(); }
+  });
+  $('moreAuth').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-xadel]'); if (b) { xa.splice(+b.getAttribute('data-xadel'), 1); renderXA(); queueSave(); }
+  });
+  function setEditT(id) {
+    editT = id || null; if (!id) editRouteKeep = '';
+    $('trainEditBar').classList.toggle('hidden', !editT);
+    $('saveTrain').textContent = editT ? 'Update Train Movement' : 'Save Train Movement';
+    $('resetTrain').textContent = editT ? 'Cancel edit' : 'Reset form';
+  }
+  function setEditS(id) {
+    editS = id || null;
+    $('shuntEditBar').classList.toggle('hidden', !editS);
+    $('saveShunt').textContent = editS ? 'Update Shunting Movement' : 'Save Shunting Movement';
+    $('resetShunt').textContent = editS ? 'Cancel edit' : 'Reset form';
+  }
+  function loadTrain(i) {
+    var r = trains[i]; if (!r) return;
+    TF.forEach(function (f) { $('t_' + f).value = fd(r[f]); });
+    P.forEach(function (p) { ['name', 'cug', 'id'].forEach(function (k) { $(p[0] + '_' + k).value = r[p[0] + '_' + k] || ''; }); });
+    var a = r.authority || 'T409';
+    if (a === 'T409' || a === 'T806') { $('t_auth').value = a; $('t_authOther').value = ''; }
+    else { $('t_auth').value = 'Other'; $('t_authOther').value = a === 'Other' ? '' : a; }
+    $('authOtherBox').classList.toggle('hidden', $('t_auth').value !== 'Other');
+    xa = (r.xa || []).map(function (x) { var k = ['T409', 'T806'].indexOf(x.name) > -1; return { a: k ? x.name : 'Other', o: k ? '' : (x.name === 'Other' ? '' : x.name), no: x.no || '' }; });
+    renderXA();
+    refreshRouteSelect();
+    var ri = -1; routes.forEach(function (x, k) { if (x.name === r.route) ri = k; });
+    $('t_route').value = ri >= 0 ? String(ri) : '';
+    editRouteKeep = (ri < 0 && r.route) ? r.route : '';
+    st = JSON.parse(JSON.stringify(r.stations || [])); renderStations();
+    blocks = (r.blocks && r.blocks.length) ? JSON.parse(JSON.stringify(r.blocks)) : [blankBlk('Block Back'), blankBlk('Block Forward')]; renderBlk();
+    t8Diff(); calcCons();
+    endSet('te', r.end);
+    setEditT(r.id); setMsg('trainMsg', '');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function resetTrain() {
+    TF.forEach(function (f) { $('t_' + f).value = ''; });
+    P.forEach(function (p) { ['name', 'cug', 'id'].forEach(function (k) { $(p[0] + '_' + k).value = ''; }); });
+    $('t_auth').value = 'T409'; $('t_authOther').value = ''; $('authOtherBox').classList.add('hidden');
+    xa = []; renderXA(); $('t806Box').classList.add('hidden'); $('t8diff').textContent = ''; resetBlocks();
+    $('t_route').value = ''; $('t_cons').value = ''; 
+    $('t_date').value = today(); st = []; renderStations(); endReset('te'); setEditT(null);
+  }
+  $('resetTrain').addEventListener('click', function () { resetTrain(); setMsg('trainMsg', ''); });
+  $('saveTrain').addEventListener('click', function () {
+    if (!$('lp_name').value.trim() || (!$('t_train').value.trim() && !$('t_loco').value.trim())) {
+      setMsg('trainMsg', 'Enter at least the LP name and a Train or Loco number.', 'err'); return;
+    }
+    var rec = { id: Date.now(), authority: $('t_auth').value === 'Other' ? ($('t_authOther').value || 'Other') : $('t_auth').value,
+      route: $('t_route').value === '' ? editRouteKeep : routes[+$('t_route').value].name, cons: $('t_cons').value,
+      stations: JSON.parse(JSON.stringify(st)) };
+    TF.forEach(function (f) { rec[f] = $('t_' + f).value; });
+    rec.xa = xa.filter(function (x) { return x.no || x.a !== 'Other' || x.o; }).map(function (x) { return { name: x.a === 'Other' ? (x.o || 'Other') : x.a, no: x.no }; });
+    if (!hasT806(rec)) { rec.t8start = ''; rec.t8end = ''; }
+    rec.blocks = hasT806(rec)
+      ? blocks.filter(function (b) { return b.st || b.no; }).map(function (b) { return { type: b.type, st: b.st, no: b.no }; }) : [];
+    rec.t8diff = diffTxt(rec.t8start, rec.t8end);
+    P.forEach(function (p) { ['name', 'cug', 'id'].forEach(function (k) { rec[p[0] + '_' + k] = $(p[0] + '_' + k).value; }); });
+    rec.end = endGet('te');
+    var ei = editT ? trains.findIndex(function (x) { return x.id === editT; }) : -1;
+    if (ei >= 0) { rec.id = editT; trains[ei] = rec; } else trains.unshift(rec);
+    store('trains', trains);
+    renderTrainList(); resetTrain(); setMsg('trainMsg', ei >= 0 ? 'Train movement updated.' : 'Train movement saved.', 'ok');
+  });
+  function renderTrainList() {
+    $('trainList').innerHTML = trains.map(function (r, i) {
+      return '<tr class="sv"><td data-l="Date">' + esc(r.date) + '</td><td data-l="Train">' + esc(r.train) + '</td><td data-l="Loco">' + esc(r.loco) + '</td><td data-l="LP">' + esc(r.lp_name) +
+        '</td><td data-l="Authority">' + esc(authText(r)) +
+        '</td><td data-l="Route">' + esc(r.route) + '</td><td data-l="Stations">' + (r.stations || []).length + '</td><td data-l="Consumption">' + esc(r.cons) +
+        '</td><td data-l="End of duty" style="min-width:260px">' + esc(endStatement(r.end)) +
+        '</td><td class="svact"><button class="btn sm" data-sht="' + i + '">Share (WhatsApp)</button><button class="btn alt sm" data-ed="' + i + '">Edit</button><button class="btn red sm" data-dt="' + i + '">Delete</button></td></tr>';
+    }).join('') || '<tr><td colspan="10" class="hint">No records yet.</td></tr>';
+  }
+  $('trainList').addEventListener('click', function (e) {
+    var sh = e.target.closest('[data-sht]'); if (sh) { shareRecord('train', +sh.getAttribute('data-sht')); return; }
+    var ed = e.target.closest('[data-ed]'); if (ed) { loadTrain(+ed.getAttribute('data-ed')); return; }
+    var b = e.target.closest('[data-dt]'); if (!b) return;
+    if (confirm('Delete this record?')) { trains.splice(+b.getAttribute('data-dt'), 1); store('trains', trains); renderTrainList(); }
+  });
+  $('expTrain').addEventListener('click', function () {
+    if (!trains.length) { alert('No records to export.'); return; }
+    var h1 = ['Date', 'Train', 'Loco No', 'Shed', 'Sign On', 'LP Name', 'LP CUG', 'LP ID', 'ALP Name', 'ALP CUG', 'ALP ID', 'TM Name', 'TM CUG', 'TM ID',
+      'Sched Done', 'Sched Due', 'CTO', 'Line No', 'BPC', 'Authority', 'Route', 'Fuel T/O', 'Fuel H/O', 'Consumption',
+      'Form No', 'T806 Start', 'T806 End', 'T806 Diff (min)', 'Block Back (Station - No)', 'Block Forward (Station - No)', 'Shutdown/Secured or Handover'];
+    var a1 = [h1].concat(trains.map(function (r) {
+      return [r.date, r.train, r.loco, r.shed, r.signon, r.lp_name, r.lp_cug, r.lp_id, r.alp_name, r.alp_cug, r.alp_id, r.tm_name, r.tm_cug, r.tm_id,
+        sch(r, 'sdone'), sch(r, 'sdue'), r.cto, r.line, r.bpc, authText(r), r.route, r.fto, r.fho, r.cons,
+        r.formno, r.t8start, r.t8end, (diffMin(r.t8start, r.t8end) === null ? '' : diffMin(r.t8start, r.t8end)), blkTxt(r, 'Block Back'), blkTxt(r, 'Block Forward'), endStatement(r.end)];
+    }));
+    var h2 = ['Date', 'Train', 'Loco No', 'Station', 'ARR', 'DEP', 'Home ARR', 'Home DEP', 'Home Diff (min)', 'Home Late Off (km/h)', 'Starter Late Off (km/h)', 'CRO/MRO/Etc', 'Time 1', 'Time 2', 'Time2-Time1 (min)'];
+    var a2 = [h2];
+    trains.forEach(function (r) {
+      r.stations.forEach(function (s) {
+        var d1 = diffMin(s.hArr, s.hDep), d2 = diffMin(s.t1, s.t2);
+        a2.push([r.date, r.train, r.loco, s.name, s.arr, s.dep, s.hArr, s.hDep, d1 === null ? '' : d1, s.hLate, s.sLate, s.cType, s.t1, s.t2, d2 === null ? '' : d2]);
+      });
+    });
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(a1), 'Train Movements');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(a2), 'Station Details');
+    XLSX.writeFile(wb, 'train_movements.xlsx');
+  });
+
+  /* ---------- shunting movement ---------- */
+  var mv = [], extra = [], mPhotos = [];
+  var SFLD = ['date', 'shift', 'signon', 'master', 'pm1', 'pm2', 'train', 'loco', 'shed', 'sdone', 'sdoneK', 'sdue', 'sdueK'];
+
+  function autoShift() {
+    var h = new Date().getHours();
+    return (h >= 7 && h < 15) ? '7-15' : (h >= 15 && h < 23) ? '15-23' : '23-7';
+  }
+  function blankMv() { return { l1: '', arr: '', l2: '', dep: '', remark: '' }; }
+
+  function initShunt() {
+    $('s_date').value = today();
+    if (!$('s_shift').value) $('s_shift').value = autoShift();
+    if (!mv.length) mv.push(blankMv());
+    renderMv(); renderExtra(); renderShuntList();
+  }
+
+  /* extra staff sets: each "Add more" adds Shunting Master + Pointsman 1 + Pointsman 2 */
+  function blankSet() { return { master: '', pm1: '', pm2: '' }; }
+  function normSets(arr) {
+    return (arr || []).map(function (x) { return (x && typeof x === 'object') ? { master: x.master || '', pm1: x.pm1 || '', pm2: x.pm2 || '' } : { master: '', pm1: String(x || ''), pm2: '' }; });
+  }
+  function renderExtra() {
+    $('s_more').innerHTML = extra.map(function (v, i) {
+      function f(k, l) { return '<div><label>' + l + '</label><input list="staffList" autocomplete="off" data-x="' + i + '" data-k="' + k + '" value="' + esc(v[k]) + '"></div>'; }
+      return '<div class="group" style="grid-column:1/-1"><div class="rowx"><h3 style="margin:0;flex:1">Staff set ' + (i + 2) + '</h3>' +
+        '<button type="button" class="btn red sm" data-xd="' + i + '" title="Remove this set">&#10005;</button></div>' +
+        '<div class="grid" style="margin-top:8px">' + f('master', 'Shunting Master') + f('pm1', 'Pointsman 1') + f('pm2', 'Pointsman 2') + '</div></div>';
+    }).join('');
+  }
+  $('addPm').addEventListener('click', function () { extra.push(blankSet()); renderExtra(); });
+  $('s_more').addEventListener('input', function (e) {
+    var i = e.target.getAttribute('data-x'); if (i !== null) extra[+i][e.target.getAttribute('data-k')] = e.target.value;
+  });
+  $('s_more').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-xd]'); if (!b) return;
+    extra.splice(+b.getAttribute('data-xd'), 1); renderExtra();
+  });
+  function setsTxt(r) {
+    return (r.extra || []).map(function (x, i) {
+      var sx = (x && typeof x === 'object') ? x : { master: '', pm1: String(x || ''), pm2: '' };
+      return 'Set ' + (i + 2) + ' - SM: ' + (sx.master || '-') + ', PM1: ' + (sx.pm1 || '-') + ', PM2: ' + (sx.pm2 || '-');
+    });
+  }
+
+  /* sign on / secured time autofill */
+  ['s_signon'].forEach(function (id) {
+    $(id).addEventListener('focus', function () { if (!this.value) this.value = nowHM(); });
+  });
+
+  /* movement table */
+  function renderMv() {
+    $('mvBody').innerHTML = mv.map(function (m, i) {
+      return '<tr class="mvr"><td>' + (i + 1) + '</td>' +
+        '<td data-l="Line / SH"><input data-i="' + i + '" data-f="l1" value="' + esc(m.l1) + '"></td>' +
+        '<td data-l="ARR"><div class="tcell"><input type="time" data-i="' + i + '" data-f="arr" value="' + esc(m.arr) + '"><button type="button" class="btn alt sm" data-now="arr" data-i="' + i + '">Now</button></div></td>' +
+        '<td data-l="Line / SH"><input data-i="' + i + '" data-f="l2" value="' + esc(m.l2) + '"></td>' +
+        '<td data-l="DEP"><div class="tcell"><input type="time" data-i="' + i + '" data-f="dep" value="' + esc(m.dep) + '"><button type="button" class="btn alt sm" data-now="dep" data-i="' + i + '">Now</button></div></td>' +
+        '<td>' + (mv.length > 1 ? '<button type="button" class="btn red sm" data-md="' + i + '" title="Remove this row">&#10005;</button>' : '') + '</td></tr>' +
+        '<tr class="mvrem"><td></td><td colspan="5"><label>Remark</label><input data-i="' + i + '" data-f="remark" value="' + esc(m.remark || '') + '"></td></tr>';
+    }).join('');
+  }
+  $('addMv').addEventListener('click', function () { mv.push(blankMv()); renderMv(); });
+  function mvSet(e) {
+    var t = e.target, i = t.getAttribute('data-i'); if (i === null) return;
+    mv[+i][t.getAttribute('data-f')] = t.value;
+  }
+  $('mvBody').addEventListener('input', mvSet);
+  $('mvBody').addEventListener('change', mvSet);
+  $('mvBody').addEventListener('click', function (e) {
+    var n = e.target.closest('[data-now]');
+    if (n) { mv[+n.getAttribute('data-i')][n.getAttribute('data-now')] = nowHM(); renderMv(); return; }
+    var b = e.target.closest('[data-md]'); if (!b) return;
+    mv.splice(+b.getAttribute('data-md'), 1); renderMv();
+  });
+
+  /* photos (resized to keep browser storage small) */
+  function compress(file, cb) {
+    var fr = new FileReader();
+    fr.onload = function () {
+      var img = new Image();
+      img.onload = function () {
+        var k = Math.min(1, 800 / Math.max(img.width, img.height));
+        var c = document.createElement('canvas');
+        c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        cb(c.toDataURL('image/jpeg', 0.6));
+      };
+      img.onerror = function () { cb(null); };
+      img.src = fr.result;
+    };
+    fr.onerror = function () { cb(null); };
+    fr.readAsDataURL(file);
+  }
+  function renderPrev(arr, id) {
+    $(id).innerHTML = arr.map(function (d, i) {
+      return '<div class="thumb"><img src="' + d + '" alt="photo"><button type="button" data-ph="' + id + '" data-i="' + i + '">&#10005;</button></div>';
+    }).join('');
+  }
+  function addPhotos(input, arr, id) {
+    var list = Array.prototype.slice.call(input.files);
+    input.value = '';
+    (function next() {
+      var f = list.shift();
+      if (!f) { renderPrev(arr, id); queueSave(); return; }
+      compress(f, function (d) { if (d) arr.push(d); next(); });
+    })();
+  }
+  /* live camera */
+  var camStream = null, camFor = 'm', camFacing = 'environment', camCount = 0;
+  function camStop() {
+    if (camStream) { camStream.getTracks().forEach(function (t) { t.stop(); }); camStream = null; }
+    $('camVideo').srcObject = null;
+  }
+  function camStart() {
+    camStop(); $('camTxt').textContent = 'Starting camera…';
+    return navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: camFacing }, width: { ideal: 1280 } }, audio: false })
+      .then(function (stream) {
+        camStream = stream; $('camVideo').srcObject = stream;
+        $('camTxt').textContent = 'Live camera – tap Capture. You can take several photos.';
+      });
+  }
+  var camMode = 'live';
+  function camArr() { return camFor === 'm' ? mPhotos : endPh[camFor]; }
+  function camPrev() { return camFor === 'm' ? 'mPrev' : camFor + '_prev'; }
+  function camRefresh() {
+    $('camThumbs').innerHTML = camArr().slice(-10).map(function (d) { return '<div class="thumb"><img src="' + d + '" alt="photo"></div>'; }).join('');
+  }
+  function camShow(live) {
+    camMode = live ? 'live' : 'app';
+    $('camVideo').style.display = live ? '' : 'none'; $('camFlip').style.display = live ? '' : 'none';
+    $('camShot').innerHTML = live ? '&#128247; Capture' : '&#128247; Take photo';
+  }
+  function camFallback() {
+    camStop(); camShow(false); $('camBox').classList.add('on');
+    $('camTxt').textContent = 'Tap "Take photo" to open the phone camera. After each photo tap it again for the next one. Tap Done when finished.';
+    camRefresh();
+  }
+  $('camApp').addEventListener('change', function () {
+    var f = this.files && this.files[0]; this.value = ''; if (!f) return;
+    compress(f, function (d) {
+      if (!d) return;
+      camArr().push(d); camCount++; renderPrev(camArr(), camPrev()); camRefresh(); queueSave();
+      $('camTxt').textContent = camCount + ' photo(s) captured. Tap "Take photo" for more or Done to finish.';
+    });
+  });
+  function openCam(x) {
+    camFor = x; camCount = 0; camShow(true); camRefresh();
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { camFallback(); return; }
+    $('camBox').classList.add('on');
+    camStart().catch(function () { camFallback(); });
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-cam]'); if (!b) return;
+    openCam(b.getAttribute('data-cam'));
+  });
+
+  $('camFlip').addEventListener('click', function () {
+    camFacing = camFacing === 'environment' ? 'user' : 'environment';
+    camStart().catch(function () { $('camTxt').textContent = 'Could not switch camera.'; });
+  });
+  $('camShot').addEventListener('click', function () {
+    if (camMode === 'app') { $('camApp').click(); return; }
+    var v = $('camVideo');
+    if (!camStream || !v.videoWidth) { $('camTxt').textContent = 'Camera is not ready yet.'; return; }
+    var k = Math.min(1, 800 / Math.max(v.videoWidth, v.videoHeight));
+    var c = document.createElement('canvas');
+    c.width = Math.round(v.videoWidth * k); c.height = Math.round(v.videoHeight * k);
+    c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+    var arr = camArr();
+    arr.push(c.toDataURL('image/jpeg', 0.6)); camCount++;
+    renderPrev(arr, camPrev()); camRefresh(); queueSave();
+    var bx = $('camBox'); bx.classList.add('flash'); setTimeout(function () { bx.classList.remove('flash'); }, 150);
+    $('camTxt').textContent = camCount + ' photo(s) captured. Keep tapping Capture for more, then tap Done.';
+  });
+  function camClose() { $('camBox').classList.remove('on'); camStop(); }
+  $('camClose').addEventListener('click', camClose);
+  window.addEventListener('pagehide', camStop);
+
+  $('s_mphoto').addEventListener('change', function () { addPhotos(this, mPhotos, 'mPrev'); });
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-ph]'); if (!b) return;
+    var id = b.getAttribute('data-ph'), arr = id === 'mPrev' ? mPhotos : endPh[id.slice(0, 2)];
+    arr.splice(+b.getAttribute('data-i'), 1); renderPrev(arr, id);
+  });
+
+  /* save / reset */
+  function loadShunt(i) {
+    var r = shunts[i]; if (!r) return;
+    SFLD.forEach(function (f) { $('s_' + f).value = fd(r[f]); });
+    mv = (r.mv || []).map(function (m) { return { l1: m.l1 || '', arr: m.arr || '', l2: m.l2 || '', dep: m.dep || '', remark: m.remark || '' }; });
+    if (!mv.length) mv = [blankMv()];
+    extra = normSets(r.extra);
+    mPhotos.length = 0; (r.mPhotos || []).forEach(function (x) { mPhotos.push(x); });
+    endSet('se', r.end);
+    renderMv(); renderExtra(); renderPrev(mPhotos, 'mPrev');
+    setEditS(r.id); setMsg('shuntMsg', '');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function resetShunt() {
+    SFLD.forEach(function (f) { $('s_' + f).value = ''; });
+    mv = [blankMv()]; extra = []; mPhotos.length = 0; endReset('se');
+    renderMv(); renderExtra(); renderPrev(mPhotos, 'mPrev');
+    $('s_date').value = today(); $('s_shift').value = autoShift(); setEditS(null);
+  }
+  $('resetShunt').addEventListener('click', function () { resetShunt(); setMsg('shuntMsg', ''); });
+  $('saveShunt').addEventListener('click', function () {
+    if (!$('s_loco').value.trim() && !$('s_train').value.trim()) { setMsg('shuntMsg', 'Enter a Train or Loco number.', 'err'); return; }
+    var rec = { id: Date.now(), extra: extra.filter(function (x) { return x.master || x.pm1 || x.pm2; }).map(function (x) { return { master: x.master, pm1: x.pm1, pm2: x.pm2 }; }), end: endGet('se'),
+      mv: mv.filter(function (m) { return m.l1 || m.arr || m.l2 || m.dep || m.remark; }).map(function (m) { return { l1: m.l1, arr: m.arr, l2: m.l2, dep: m.dep, remark: m.remark || '' }; }),
+      mPhotos: mPhotos.slice() };
+    SFLD.forEach(function (f) { rec[f] = $('s_' + f).value; });
+    var ei = editS ? shunts.findIndex(function (x) { return x.id === editS; }) : -1, oldRec = null;
+    if (ei >= 0) { rec.id = editS; oldRec = shunts[ei]; shunts[ei] = rec; } else shunts.unshift(rec);
+    if (!store('shunts2', shunts)) {
+      if (ei >= 0) shunts[ei] = oldRec; else shunts.shift();
+      setMsg('shuntMsg', 'Could not save: browser storage is full. Remove some photos or delete older records and try again.', 'err');
+      return;
+    }
+    renderShuntList(); resetShunt(); setMsg('shuntMsg', ei >= 0 ? 'Shunting movement updated.' : 'Shunting movement saved.', 'ok');
+  });
+
+  /* saved list */
+  function shDet(r) {
+    var staffTxt = [r.master && ('Master: ' + r.master), r.pm1 && ('Pointsman 1: ' + r.pm1), r.pm2 && ('Pointsman 2: ' + r.pm2)]
+      .concat(setsTxt(r)).filter(Boolean).join(' | ');
+    var endH = '<p><b>SHUTDOWN / SECURED OR HANDOVER:</b> ' + (endStatement(r.end) ? esc(endStatement(r.end)) : '-') + '</p>' + (r.end && r.end.photos && r.end.photos.length ? '<p><b>Shutdown / Secured photos:</b></p>' + imgs(r.end.photos) : '');
+    var mvt = r.mv.length ? '<table><thead><tr><th>Line/SH</th><th>ARR</th><th>Line/SH</th><th>DEP</th><th>Remark</th></tr></thead><tbody>' +
+      r.mv.map(function (m) { return '<tr><td>' + esc(m.l1) + '</td><td>' + esc(m.arr) + '</td><td>' + esc(m.l2) + '</td><td>' + esc(m.dep) + '</td><td>' + esc(m.remark || '') + '</td></tr>'; }).join('') +
+      '</tbody></table>' : '<span class="hint">No movements recorded.</span>';
+    function imgs(a) { return a.length ? '<div class="thumbs">' + a.map(function (d) { return '<div class="thumb"><img src="' + d + '" alt="photo"></div>'; }).join('') + '</div>' : '<span class="hint">None</span>'; }
+    return '<div style="white-space:normal"><p><b>Sign on:</b> ' + esc(r.signon) + ' &nbsp; <b>Staff:</b> ' + esc(staffTxt) + '</p>' +
+      '<p><b>Schedule done:</b> ' + esc(sch(r, 'sdone')) + ' &nbsp; <b>due:</b> ' + esc(sch(r, 'sdue')) + ' &nbsp; <b>Shed:</b> ' + esc(r.shed) + '</p>' +
+      mvt + endH +
+      '<p><b>Movement photos:</b></p>' + imgs(r.mPhotos) + '</div>';
+  }
+  function renderShuntList() {
+    $('shuntList').innerHTML = shunts.map(function (r, i) {
+      return '<tr class="sv"><td data-l="Date">' + esc(r.date) + '</td><td data-l="Shift">' + esc(r.shift) + '</td><td data-l="Train">' + esc(r.train) + '</td><td data-l="Loco">' + esc(r.loco) + '</td><td data-l="Shunting Master">' + esc(r.master) +
+        '</td><td data-l="Movements">' + r.mv.length + '</td><td data-l="End of duty" style="min-width:260px">' + esc(endStatement(r.end)) +
+        '</td><td class="svact"><button class="btn sm" data-shs="' + i + '">Share (WhatsApp)</button><button class="btn alt sm" data-es="' + i + '">Edit</button><button class="btn alt sm" data-dd="' + i + '">Details</button><button class="btn red sm" data-ds="' + i + '">Delete</button></td></tr>' +
+        '<tr class="det hidden" id="sdet' + i + '"><td colspan="8">' + shDet(r) + '</td></tr>';
+    }).join('') || '<tr><td colspan="8" class="hint">No records yet.</td></tr>';
+  }
+  $('shuntList').addEventListener('click', function (e) {
+    var sh = e.target.closest('[data-shs]'); if (sh) { shareRecord('shunt', +sh.getAttribute('data-shs')); return; }
+    var es = e.target.closest('[data-es]'); if (es) { loadShunt(+es.getAttribute('data-es')); return; }
+    var d = e.target.closest('[data-dd]');
+    if (d) { $('sdet' + d.getAttribute('data-dd')).classList.toggle('hidden'); return; }
+    var b = e.target.closest('[data-ds]'); if (!b) return;
+    if (confirm('Delete this record?')) { shunts.splice(+b.getAttribute('data-ds'), 1); store('shunts2', shunts); renderShuntList(); }
+  });
+  $('expShunt').addEventListener('click', function () {
+    if (!shunts.length) { alert('No records to export.'); return; }
+    var a1 = [['Date', 'Shift', 'Sign On', 'Shunting Master', 'Pointsman 1', 'Pointsman 2', 'Additional Staff Sets', 'Train', 'Loco No', 'Shed', 'Schedule Done', 'Schedule Due']
+      .concat(['Shutdown/Secured or Handover', 'Movement Photos'])]
+      .concat(shunts.map(function (r) {
+        return [r.date, r.shift, r.signon, r.master, r.pm1, r.pm2, setsTxt(r).join(' ; '), r.train, r.loco, r.shed, sch(r, 'sdone'), sch(r, 'sdue')]
+          .concat([endStatement(r.end), r.mPhotos.length]);
+      }));
+    var a2 = [['Date', 'Shift', 'Train', 'Loco No', 'Line/SH', 'ARR', 'Line/SH', 'DEP', 'Remark']];
+    shunts.forEach(function (r) {
+      r.mv.forEach(function (m) { a2.push([r.date, r.shift, r.train, r.loco, m.l1, m.arr, m.l2, m.dep, m.remark || '']); });
+    });
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(a1), 'Shunting');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(a2), 'Movements');
+    XLSX.writeFile(wb, 'shunting_movements.xlsx');
+  });
+
+  /* ---------- upload crew (Excel) ---------- */
+  function parseSheet(aoa) {
+    var out = [], skipped = 0;
+    aoa.forEach(function (cells, i) {
+      var p = cells.map(function (s) { return String(s == null ? '' : s).trim(); });
+      if (!p.some(Boolean)) return;
+      if (i === 0 && /name/i.test(p[0]) && /cug/i.test(p.join(' '))) return;
+      if (p.length < 3 || !p[0]) { skipped++; return; }
+      out.push({ name: p[0].toUpperCase(), cug: p[1], id: p[2].toUpperCase() });
+    });
+    return { rows: out, skipped: skipped };
+  }
+  function renderCrew() {
+    var term = $('crewQ').value.toLowerCase();
+    document.querySelectorAll('#crewTabs .tab').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-cat') === cat); });
+    $('crewTitle').textContent = 'Upload ' + CN[cat] + ' Details';
+    $('uploadLbl').textContent = 'Upload ' + CN[cat] + ' Details';
+    var shown = crew[cat].filter(function (r) { return !term || (r.name + ' ' + r.cug + ' ' + r.id).toLowerCase().indexOf(term) > -1; });
+    $('crewBody').innerHTML = shown.map(function (r, i) {
+      var ok = /^\d{10}$/.test(String(r.cug).replace(/\D/g, ''));
+      return '<tr><td>' + (i + 1) + '</td><td>' + esc(r.name) + '</td><td' + (ok ? '' : ' style="color:#b42318;font-weight:600" title="CUG should be 10 digits"') + '>' +
+        esc(r.cug) + '</td><td>' + esc(r.id) + '</td></tr>';
+    }).join('');
+    $('crewCount').textContent = 'Showing ' + shown.length + ' of ' + crew[cat].length + ' ' + CN[cat] + ' members';
+  }
+  function handleCrew(file) {
+    if (!file) return;
+    $('fname').textContent = file.name;
+    var rd = new FileReader();
+    rd.onload = function () {
+      var res;
+      try {
+        var wb = XLSX.read(rd.result, { type: 'array' });
+        res = parseSheet(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, defval: '' }));
+      } catch (e) { setMsg('crewMsg', 'Could not read this Excel file. Please upload a valid .xlsx or .xls file.', 'err'); return; }
+      if (!res.rows.length) { setMsg('crewMsg', 'No valid records found. Each row needs 3 columns: NAME, CUG, ID.', 'err'); return; }
+      var added = 0, updated = 0, key = function (r) { return String(r.id || '').trim().toUpperCase() || (r.name + '|' + r.cug); };
+      var idx = {}; crew[cat].forEach(function (r, k) { idx[key(r)] = k; });
+      res.rows.forEach(function (r) {
+        var k = key(r);
+        if (idx[k] !== undefined) { crew[cat][idx[k]] = r; updated++; }
+        else { idx[k] = crew[cat].push(r) - 1; added++; }
+      });
+      store('crew3', crew); refreshLists(); renderCrew();
+      setMsg('crewMsg', added + ' new ' + CN[cat] + ' record(s) added to the existing list' + (updated ? '; ' + updated + ' existing record(s) (same ID) updated' : '') + (res.skipped ? '; ' + res.skipped + ' row(s) skipped (missing values)' : '') + '. Previous details are kept. Total: ' + crew[cat].length + '.', 'ok');
+    };
+    rd.onerror = function () { setMsg('crewMsg', 'Could not read the file.', 'err'); };
+    rd.readAsArrayBuffer(file);
+  }
+  var drop = $('drop');
+  $('file').addEventListener('change', function () { handleCrew(this.files[0]); this.value = ''; });
+  ['dragenter', 'dragover'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('over'); }); });
+  ['dragleave', 'drop'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('over'); }); });
+  drop.addEventListener('drop', function (e) { handleCrew(e.dataTransfer.files[0]); });
+  $('crewQ').addEventListener('input', renderCrew);
+  $('crewTabs').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-cat]'); if (!b) return;
+    cat = b.getAttribute('data-cat'); $('crewQ').value = ''; $('fname').textContent = ''; setMsg('crewMsg', ''); renderCrew();
+  });
+  $('crewClear').addEventListener('click', function () {
+    if (crew[cat].length && confirm('Clear the saved ' + CN[cat] + ' list?')) { crew[cat] = []; store('crew3', crew); refreshLists(); renderCrew(); setMsg('crewMsg', ''); $('fname').textContent = ''; }
+  });
+  $('crewDl').addEventListener('click', function () {
+    if (!crew[cat].length) return;
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['Name', 'CUG', 'ID']].concat(crew[cat].map(function (r) { return [r.name, r.cug, r.id]; }))), CN[cat]);
+    XLSX.writeFile(wb, cat + '_details.xlsx');
+  });
+
+  /* ---------- routes ---------- */
+  $('saveRoute').addEventListener('click', function () {
+    var name = $('r_name').value.trim();
+    var list = $('r_stations').value.split(/[\n,]+/).map(function (s) { return s.trim(); }).filter(Boolean);
+    if (!name || !list.length) { setMsg('routeMsg', 'Enter a route name and at least one station.', 'err'); return; }
+    routes.push({ name: name, stations: list }); store('routes', routes);
+    $('r_name').value = ''; $('r_stations').value = '';
+    renderRoutes(); setMsg('routeMsg', 'Route added.', 'ok');
+  });
+  function renderRoutes() {
+    $('routeList').innerHTML = routes.map(function (r, i) {
+      return '<tr><td>' + esc(r.name) + '</td><td>' + esc(r.stations.join(' \u2192 ')) +
+        '</td><td><button class="btn red sm" data-dr="' + i + '">Delete</button></td></tr>';
+    }).join('') || '<tr><td colspan="3" class="hint">No routes added yet.</td></tr>';
+  }
+  $('routeList').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-dr]'); if (!b) return;
+    if (confirm('Delete this route?')) { routes.splice(+b.getAttribute('data-dr'), 1); store('routes', routes); renderRoutes(); }
+  });
+
+  /* ---------- shunting staff ---------- */
+  $('saveStaff').addEventListener('click', function () {
+    var name = $('ss_name').value.trim();
+    if (!name) { setMsg('staffMsg', 'Enter the staff name.', 'err'); return; }
+    staff.push({ name: name, cug: $('ss_cug').value.trim(), id: $('ss_id').value.trim(), desig: $('ss_desig').value.trim() });
+    store('sstaff', staff); refreshLists();
+    ['ss_name', 'ss_cug', 'ss_id', 'ss_desig'].forEach(function (id) { $(id).value = ''; });
+    renderStaff(); setMsg('staffMsg', 'Staff added.', 'ok');
+  });
+  function renderStaff() {
+    $('staffBody').innerHTML = staff.map(function (s, i) {
+      return '<tr><td>' + (i + 1) + '</td><td>' + esc(s.name) + '</td><td>' + esc(s.cug) + '</td><td>' + esc(s.id) + '</td><td>' + esc(s.desig) +
+        '</td><td><button class="btn red sm" data-dx="' + i + '">Delete</button></td></tr>';
+    }).join('') || '<tr><td colspan="6" class="hint">No shunting staff added yet.</td></tr>';
+  }
+  $('staffBody').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-dx]'); if (!b) return;
+    if (confirm('Delete this staff member?')) { staff.splice(+b.getAttribute('data-dx'), 1); store('sstaff', staff); refreshLists(); renderStaff(); }
+  });
+
+  /* all typed text is converted to CAPITAL LETTERS (capture phase: runs before the other input handlers) */
+  document.addEventListener('input', function (e) {
+    var t = e.target;
+    if (!t || t.readOnly) return;
+    if (t.hasAttribute && t.hasAttribute('data-date')) {
+      var dg = t.value.replace(/\D/g, '').slice(0, 8), o = dg;
+      if (dg.length > 4) o = dg.slice(0, 2) + '/' + dg.slice(2, 4) + '/' + dg.slice(4); else if (dg.length > 2) o = dg.slice(0, 2) + '/' + dg.slice(2);
+      if (t.value !== o) t.value = o;
+      return;
+    }
+    if (t.hasAttribute && t.hasAttribute('data-num') && /\D/.test(t.value)) { t.value = t.value.replace(/\D/g, ''); return; }
+    var ok = t.tagName === 'TEXTAREA' || (t.tagName === 'INPUT' && ['text', 'search', 'tel'].indexOf(t.type) > -1);
+    if (!ok) return;
+    var v = t.value, u = v.toUpperCase();
+    if (v !== u) {
+      var a = t.selectionStart, b = t.selectionEnd;
+      t.value = u;
+      try { t.setSelectionRange(a, b); } catch (x) {}
+    }
+  }, true);
+
+  /* every time box fills the current time when it is empty and clicked / focused */
+  document.addEventListener('focusin', function (e) {
+    var t = e.target;
+    if (t && t.tagName === 'INPUT' && t.type === 'time' && !t.value && !t.readOnly && !t.disabled) {
+      t.value = nowHM();
+      t.dispatchEvent(new Event('input', { bubbles: true }));
+      t.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  });
+
+  /* ---------- share as PDF (WhatsApp) ---------- */
+  function S(v) { return (v == null || v === '') ? '-' : String(v); }
+  function newDoc(title, orient, sub) {
+    var J = window.jspdf.jsPDF;
+    var doc = new J({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    var pw = doc.internal.pageSize.getWidth();
+    doc.setFillColor(29, 78, 216); doc.rect(0, 0, pw, 25, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(17); doc.text(title, 10, 11);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
+    doc.text(sub || '', 10, 17); doc.text('Generated ' + new Date().toLocaleString(), 10, 21.5);
+    doc.setTextColor(0, 0, 0); doc._y = 31;
+    return doc;
+  }
+  function secTitle(doc, t) {
+    var pw = doc.internal.pageSize.getWidth();
+    if (doc._y > doc.internal.pageSize.getHeight() - 32) { doc.addPage(); doc._y = 14; }
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.setTextColor(29, 78, 216);
+    doc.text(String(t).toUpperCase(), 10, doc._y + 4);
+    doc.setDrawColor(29, 78, 216); doc.setLineWidth(0.4); doc.line(10, doc._y + 6, pw - 10, doc._y + 6);
+    doc.setTextColor(0, 0, 0); doc.setFont('helvetica', 'normal'); doc._y += 9;
+  }
+  function tbl(doc, title, head, body, opts) {
+    secTitle(doc, title);
+    doc.autoTable(Object.assign({ startY: doc._y, head: head ? [head] : undefined, body: body, theme: 'grid',
+      styles: { fontSize: 8.5, cellPadding: 1.8, lineColor: [200, 208, 224], lineWidth: 0.1, textColor: [20, 20, 20] },
+      headStyles: { fillColor: [29, 78, 216], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: head ? { fillColor: [247, 249, 253] } : {},
+      margin: { left: 10, right: 10, bottom: 16 } }, opts || {}));
+    doc._y = doc.lastAutoTable.finalY + 5;
+  }
+  function kvRows(pairs) {
+    var rows = [];
+    for (var i = 0; i < pairs.length; i += 2) {
+      var a = pairs[i], b = pairs[i + 1] || ['', ''];
+      rows.push([a[0], S(a[1]), b[0], b[1] === '' && !pairs[i + 1] ? '' : S(b[1])]);
+    }
+    return rows;
+  }
+  var KV = { columnStyles: { 0: { fontStyle: 'bold', fillColor: [240, 243, 249], cellWidth: 32 }, 1: { cellWidth: 'auto' }, 2: { fontStyle: 'bold', fillColor: [240, 243, 249], cellWidth: 32 }, 3: { cellWidth: 'auto' } } };
+
+  /* shutdown / secured or handover statement: bold, in a highlighted box */
+  function endPdf(doc, e) {
+    var t = endStatement(e); if (!t) return;
+    var pw = doc.internal.pageSize.getWidth(), ph = doc.internal.pageSize.getHeight();
+    var heading = e.type === 'sd' ? 'SHUTDOWN / SECURED STATEMENT' : 'HANDOVER STATEMENT';
+    secTitle(doc, heading);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+    var lines = doc.splitTextToSize(t.toUpperCase(), pw - 20 - 10), h = lines.length * 5.6 + 9;
+    if (doc._y + h > ph - 16) { doc.addPage(); doc._y = 14; }
+    var y0 = doc._y;
+    doc.setFillColor(238, 243, 255); doc.rect(10, y0, pw - 20, h, 'F');
+    doc.setDrawColor(29, 78, 216); doc.setLineWidth(0.5); doc.rect(10, y0, pw - 20, h, 'S');
+    doc.setFillColor(29, 78, 216); doc.rect(10, y0, 2.2, h, 'F');
+    doc.setTextColor(0, 0, 0); doc.text(lines, 16, y0 + 8);
+    doc.setFont('helvetica', 'normal'); doc._y = y0 + h + 6;
+  }
+  function pdfFooter(doc, label) {
+    var n = doc.internal.getNumberOfPages(), pw = doc.internal.pageSize.getWidth(), ph = doc.internal.pageSize.getHeight();
+    for (var i = 1; i <= n; i++) {
+      doc.setPage(i);
+      doc.setDrawColor(200, 208, 224); doc.setLineWidth(0.2); doc.line(10, ph - 11, pw - 10, ph - 11);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(110, 110, 110);
+      doc.text(label, 10, ph - 6.5); doc.text('Page ' + i + ' of ' + n, pw - 10, ph - 6.5, { align: 'right' });
+    }
+    doc.setTextColor(0, 0, 0);
+  }
+  async function trainPdf(r) {
+    var doc = newDoc('TRAIN MOVEMENT', 'portrait', 'Date: ' + S(r.date) + '   |   Train: ' + S(r.train) + '   |   Loco: ' + S(r.loco) + '   |   LP: ' + S(r.lp_name));
+    tbl(doc, 'Journey', null, kvRows([['Date', r.date], ['Sign On', r.signon], ['Train', r.train], ['BPC', r.bpc],
+      ['Authority', r.authority], ['No.', r.formno]].concat((r.xa || []).reduce(function (acc, x, i) { return acc.concat([['Authority ' + (i + 2), x.name], ['No.', x.no]]); }, [])).concat([['Route', r.route], ['Line No.', r.line]])), KV);
+    tbl(doc, 'Crew', ['Role', 'Name', 'CUG', 'ID'], [['LP', S(r.lp_name), S(r.lp_cug), S(r.lp_id)],
+      ['ALP', S(r.alp_name), S(r.alp_cug), S(r.alp_id)], ['TM', S(r.tm_name), S(r.tm_cug), S(r.tm_id)]],
+      { columnStyles: { 0: { fontStyle: 'bold', cellWidth: 20 } } });
+    tbl(doc, 'Loco', null, kvRows([['Loco No.', r.loco], ['Shed', r.shed], ['Schedule Done', sch(r, 'sdone')], ['Schedule Due', sch(r, 'sdue')], ['CTO', r.cto]]), KV);
+    if (hasT806(r)) {
+      tbl(doc, 'T806', null, kvRows([['Start Time', r.t8start], ['End Time', r.t8end], ['Diff', r.t8diff]]), KV);
+      if ((r.blocks || []).length) tbl(doc, 'Block Back / Block Forward', ['Type', 'Station', 'No.'], r.blocks.map(function (b) { return [S(b.type), S(b.st), S(b.no)]; }));
+    }
+    var sts = r.stations || [];
+    if (sts.length) {
+      tbl(doc, 'Stations', ['#', 'Station', 'ARR', 'DEP'],
+        sts.map(function (x, i) { return [i + 1, S(x.name), S(x.arr), S(x.dep)]; }),
+        { columnStyles: { 0: { cellWidth: 12 }, 2: { cellWidth: 32 }, 3: { cellWidth: 32 } } });
+      var det = sts.filter(function (x) { return x.hArr || x.hDep || x.hLate || x.sLate || x.t1 || x.t2; });
+      if (det.length) {
+        tbl(doc, 'Detention details', ['Station', 'Home ARR', 'Home DEP', 'Home Diff', 'Home Late (km/h)', 'Starter Late (km/h)', 'Type', 'Time 1', 'Time 2', 'T2 - T1'],
+          det.map(function (x) {
+            return [S(x.name), S(x.hArr), S(x.hDep), S(diffTxt(x.hArr, x.hDep)), S(x.hLate), S(x.sLate), S(x.cType), S(x.t1), S(x.t2), S(diffTxt(x.t1, x.t2))];
+          }), { styles: { fontSize: 7.5, cellPadding: 1.5 } });
+      }
+    }
+    tbl(doc, 'Fuel', null, kvRows([['Fuel T/O', r.fto], ['Fuel H/O', r.fho], ['Consumption', r.cons]]), KV);
+    endPdf(doc, r.end);
+    await pdfPhotos(doc, 'Shutdown / Secured photos', r.end && r.end.photos);
+    pdfFooter(doc, 'Train Movement  |  ' + S(r.date) + '  |  Train ' + S(r.train) + '  |  Loco ' + S(r.loco));
+    return doc;
+  }
+
+  function imgDims(d) {
+    return new Promise(function (res) {
+      var im = new Image();
+      im.onload = function () { res({ w: im.width, h: im.height }); };
+      im.onerror = function () { res(null); };
+      im.src = d;
+    });
+  }
+  async function pdfPhotos(doc, title, arr) {
+    if (!arr || !arr.length) return;
+    secTitle(doc, title);
+    var pw = doc.internal.pageSize.getWidth(), ph = doc.internal.pageSize.getHeight();
+    var cw = (pw - 20 - 6) / 2, x = 10, rowH = 0;
+    for (var i = 0; i < arr.length; i++) {
+      var dm = await imgDims(arr[i]); if (!dm) continue;
+      var w = cw, h = w * dm.h / dm.w;
+      if (h > 90) { h = 90; w = h * dm.w / dm.h; }
+      if (doc._y + h > ph - 16) { doc.addPage(); doc._y = 14; x = 10; rowH = 0; }
+      doc.addImage(arr[i], 'JPEG', x, doc._y, w, h);
+      if (x === 10) { x = 10 + cw + 6; rowH = Math.max(rowH, h); }
+      else { x = 10; doc._y += Math.max(rowH, h) + 4; rowH = 0; }
+    }
+    if (x !== 10) doc._y += rowH + 4;
+  }
+  async function shuntPdf(r) {
+    var doc = newDoc('SHUNTING MOVEMENT', 'portrait', 'Date: ' + S(r.date) + '   |   Shift: ' + S(r.shift) + '   |   Train: ' + S(r.train) + '   |   Loco: ' + S(r.loco));
+    var duty = [['Date', r.date], ['Shift', r.shift], ['Sign On', r.signon], ['Shunting Master', r.master], ['Pointsman 1', r.pm1], ['Pointsman 2', r.pm2]]
+      .concat((r.extra || []).reduce(function (acc, x, i) {
+        var sx = (x && typeof x === 'object') ? x : { master: '', pm1: String(x || ''), pm2: '' };
+        return acc.concat([['Shunting Master (set ' + (i + 2) + ')', sx.master], ['Pointsman 1 (set ' + (i + 2) + ')', sx.pm1], ['Pointsman 2 (set ' + (i + 2) + ')', sx.pm2]]);
+      }, []));
+    tbl(doc, 'Duty', null, kvRows(duty), KV);
+    tbl(doc, 'Loco', null, kvRows([['Train', r.train], ['Loco No.', r.loco], ['Shed', r.shed], ['Schedule Done', sch(r, 'sdone')], ['Schedule Due', sch(r, 'sdue')]]), KV);
+    if (r.mv && r.mv.length) tbl(doc, 'Movement', ['#', 'Line / SH', 'ARR', 'Line / SH', 'DEP', 'Remark'],
+      r.mv.map(function (m, i) { return [i + 1, S(m.l1), S(m.arr), S(m.l2), S(m.dep), S(m.remark)]; }));
+    endPdf(doc, r.end);
+    await pdfPhotos(doc, 'Shutdown / Secured photos', r.end && r.end.photos);
+    await pdfPhotos(doc, 'Movement photos', r.mPhotos);
+    pdfFooter(doc, 'Shunting Movement  |  ' + S(r.date) + '  |  Train ' + S(r.train) + '  |  Loco ' + S(r.loco));
+    return doc;
+  }
+
+  var sharing = false;
+  async function shareRecord(kind, i) {
+    var msgId = kind === 'train' ? 'trainMsg' : 'shuntMsg';
+    if (sharing) return;
+    if (!window.jspdf || !window.jspdf.jsPDF) { setMsg(msgId, 'PDF library could not load. Connect to the internet and reload the page.', 'err'); return; }
+    var r = kind === 'train' ? trains[i] : shunts[i]; if (!r) return;
+    sharing = true; setMsg(msgId, 'Preparing PDF…');
+    try {
+      var doc = kind === 'train' ? await trainPdf(r) : await shuntPdf(r);
+      var base = (kind === 'train' ? 'TRAIN_' : 'SHUNTING_') + String(r.train || r.loco || 'RECORD') + '_' + (r.date || '');
+      var name = base.replace(/[^A-Za-z0-9_-]+/g, '_') + '.pdf';
+      var blob = doc.output('blob');
+      var text = (kind === 'train' ? 'TRAIN MOVEMENT' : 'SHUNTING MOVEMENT') + ' - ' + S(r.date) +
+        (r.train ? ' - TRAIN ' + r.train : '') + (r.loco ? ' - LOCO ' + r.loco : '') +
+        (kind === 'train' ? (r.lp_name ? ' - LP ' + r.lp_name : '') : (r.master ? ' - SM ' + r.master : ''));
+      var file = new File([blob], name, { type: 'application/pdf' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: name, text: text });
+          setMsg(msgId, 'Shared. Choose WhatsApp in the share sheet next time too.', 'ok');
+          sharing = false; return;
+        } catch (e) {
+          if (e && e.name === 'AbortError') { setMsg(msgId, ''); sharing = false; return; }
+        }
+      }
+      // fallback: download the PDF, open WhatsApp with a text summary
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+      window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+      setMsg(msgId, 'PDF downloaded (' + name + '). In WhatsApp, attach this file to send it.', 'ok');
+    } catch (e) {
+      setMsg(msgId, 'Could not create the PDF: ' + (e && e.message ? e.message : e), 'err');
+    }
+    sharing = false;
+  }
+
+  /* ---------- Schedule Due auto-calculation: Schedule Done date + days of the Due type (TI 45, IA 90, IB 180, IC 270) ---------- */
+  var DUE_DAYS = { TI: 45, IA: 90, IB: 180, IC: 270 };
+  function parseDMY(v) {
+    var m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(v || ''); if (!m) return null;
+    var d = new Date(Date.UTC(+m[3], +m[2] - 1, +m[1]));
+    return (d.getUTCFullYear() === +m[3] && d.getUTCMonth() === +m[2] - 1 && d.getUTCDate() === +m[1]) ? d : null;
+  }
+  function dueCalc(pre, manual) {
+    var dk = $(pre + 'sdoneK').value, uk = $(pre + 'sdueK').value, el = $(pre + 'sdue');
+    var base = parseDMY($(pre + 'sdone').value), days = DUE_DAYS[uk];
+    if (dk !== uk || !days) {                      // different types (or no interval): type the due date manually
+      if (el.dataset.auto === '1') { el.value = ''; delete el.dataset.auto; el.dispatchEvent(new Event('input', { bubbles: true })); }
+      if (manual) alert(dk !== uk ? 'Auto calculate works only when Schedule Done and Schedule Due have the same type (TI, IA, IB or IC). Please type the due date manually.'
+        : 'Choose TI, IA, IB or IC as the type to auto calculate. For other types type the due date manually.');
+      return;
+    }
+    if (!base) { if (manual) alert('Enter a valid Schedule Done date first.'); return; }
+    base.setUTCDate(base.getUTCDate() + days);
+    el.value = pad(base.getUTCDate()) + '/' + pad(base.getUTCMonth() + 1) + '/' + base.getUTCFullYear();
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dataset.auto = '1';
+  }
+  ['t_', 's_'].forEach(function (pre) {
+    $(pre + 'sdone').addEventListener('input', function () { if (this.value.length === 10) dueCalc(pre, false); });
+    $(pre + 'sdoneK').addEventListener('change', function () { dueCalc(pre, false); });
+    $(pre + 'sdueK').addEventListener('change', function () { dueCalc(pre, false); });
+    $(pre + 'sdue').addEventListener('input', function () { delete this.dataset.auto; });
+  });
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-duecalc]'); if (b) dueCalc(b.getAttribute('data-duecalc'), true);
+  });
+
+  /* ---------- auto-save every field as you type (refresh / crash / close safe) ---------- */
+  var DRAFT_KEY = 'draft_v1', saveTimer = null;
+
+  function collectDraft() {
+    var d = { view: curView, train: {}, shunt: {}, route: {}, staff: {}, editT: editT, editS: editS }, t = d.train, h = d.shunt;
+    TF.forEach(function (f) { t[f] = $('t_' + f).value; });
+    P.forEach(function (p) { ['name', 'cug', 'id'].forEach(function (k) { t[p[0] + '_' + k] = $(p[0] + '_' + k).value; }); });
+    t.xa = xa; t.auth = $('t_auth').value; t.authOther = $('t_authOther').value; t.route = $('t_route').value;
+    t.st = st; t.blocks = blocks;
+    SFLD.forEach(function (f) { h[f] = $('s_' + f).value; });
+    h.end = endGet('se'); t.end = endGet('te');
+    h.mv = mv; h.extra = extra; h.mPhotos = mPhotos;
+    d.route = { name: $('r_name').value, stations: $('r_stations').value };
+    d.staff = { name: $('ss_name').value, cug: $('ss_cug').value, id: $('ss_id').value, desig: $('ss_desig').value };
+    return d;
+  }
+  function saveDraft() {
+    clearTimeout(saveTimer); saveTimer = null;
+    var d = collectDraft();
+    if (!store(DRAFT_KEY, d)) {                       // storage full: keep the text, drop the photos
+      d.shunt.mPhotos = []; if (d.shunt.end) d.shunt.end.photos = []; if (d.train.end) d.train.end.photos = [];
+      if (!store(DRAFT_KEY, d)) { $('saveStat').textContent = 'Auto-save failed (storage full)'; return; }
+    }
+    $('saveStat').textContent = '✓ Auto-saved ' + nowHM();
+  }
+  function queueSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveDraft, 400); }
+
+  function restoreDraft() {
+    var d = load(DRAFT_KEY, null); if (!d) return;
+    var t = d.train || {}, h = d.shunt || {};
+    TF.forEach(function (f) { if (f !== 'date' && t[f] != null) $('t_' + f).value = fd(t[f]); });
+    P.forEach(function (p) { ['name', 'cug', 'id'].forEach(function (k) { if (t[p[0] + '_' + k] != null) $(p[0] + '_' + k).value = t[p[0] + '_' + k]; }); });
+    if (t.auth) $('t_auth').value = t.auth;
+    $('t_authOther').value = t.authOther || '';
+    $('authOtherBox').classList.toggle('hidden', $('t_auth').value !== 'Other');
+    xa = (t.xa || []).slice(); renderXA();
+    refreshRouteSelect(); $('t_route').value = t.route || '';
+    st = t.st || []; renderStations();
+    if (t.blocks && t.blocks.length) { blocks = t.blocks; renderBlk(); }
+    t8Diff(); calcCons();
+
+    SFLD.forEach(function (f) { if (f !== 'date' && h[f] != null) $('s_' + f).value = fd(h[f]); });
+    endSet('se', h.end); endSet('te', t.end);
+    mv = (h.mv && h.mv.length) ? h.mv : [blankMv()];
+    extra = normSets(h.extra);
+    mPhotos.length = 0; (h.mPhotos || []).forEach(function (x) { mPhotos.push(x); });
+    renderMv(); renderExtra(); renderPrev(mPhotos, 'mPrev');
+    shuntDurNone();
+
+    var r = d.route || {}; $('r_name').value = r.name || ''; $('r_stations').value = r.stations || '';
+    var f = d.staff || {}; $('ss_name').value = f.name || ''; $('ss_cug').value = f.cug || ''; $('ss_id').value = f.id || ''; $('ss_desig').value = f.desig || '';
+
+    if (d.editT && trains.some(function (x) { return x.id === d.editT; })) setEditT(d.editT);
+    if (d.editS && shunts.some(function (x) { return x.id === d.editS; })) setEditS(d.editS);
+    if (d.view && d.view !== 'home' && $('v-' + d.view)) show(d.view);
+    $('saveStat').textContent = '✓ Draft restored';
+  }
+  function shuntDurNone() {}
+
+  document.addEventListener('input', queueSave);
+  document.addEventListener('change', queueSave);
+  document.addEventListener('click', queueSave);
+  window.addEventListener('pagehide', saveDraft);
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') saveDraft(); });
+
+  refreshLists();
+  restoreDraft();
+})();
+</script>
+</body>
+</html>
+
+</body></html>
