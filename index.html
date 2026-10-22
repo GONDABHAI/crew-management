@@ -144,6 +144,11 @@
   #camTxt { color:#fff; font-size:.9rem; text-align:center; }
   #camThumbs .thumb img { height:56px; }
   #camBox.flash #camVideo { opacity:.35; }
+  #viewBox { position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:9000; display:none; overflow:auto; padding:12px; }
+  #viewBox.on { display:block; }
+  #viewCard { max-width:900px; margin:0 auto; background:var(--card); color:var(--ink); border-radius:12px; padding:16px; }
+  #viewCard h3 { margin:16px 0 8px; } #viewCard table { margin-bottom:6px; }
+  #viewCard td.k { font-weight:600; background:#f0f3f9; width:30%; } html.dark #viewCard td.k { background:#202b3b; }
   .tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
   .tab { background:#fff; color:var(--brand); border:1px solid var(--brand); border-radius:8px; padding:9px 16px; font-size:.95rem; cursor:pointer; }
   .tab.active { background:var(--brand); color:#fff; }
@@ -297,6 +302,7 @@
 
   <div class="card">
     <h2>Saved Train Movements</h2>
+    <div id="trainListMsg" class="msg"></div>
     <div class="wrap"><table id="trainTable">
       <thead><tr><th>Date</th><th>Train</th><th>Loco</th><th>LP</th><th>Authority</th><th>Route</th><th>Stations</th><th>Consumption</th><th>End of duty</th><th></th></tr></thead>
       <tbody id="trainList"></tbody></table></div>
@@ -362,6 +368,7 @@
 
   <div class="card">
     <h2>Saved Shunting Movements</h2>
+    <div id="shuntListMsg" class="msg"></div>
     <div class="wrap"><table id="shuntTable">
       <thead><tr><th>Date</th><th>Shift</th><th>Train</th><th>Loco</th><th>Shunting Master</th><th>Movements</th><th>End of duty</th><th></th></tr></thead>
       <tbody id="shuntList"></tbody></table></div>
@@ -440,6 +447,15 @@
 </section>
 </main>
 
+<div id="viewBox"><div id="viewCard">
+  <div class="actions" style="margin:0 0 8px;position:sticky;top:0;background:var(--card);padding:6px 0;z-index:2">
+    <button type="button" class="btn sm" id="vShare">Share (WhatsApp)</button>
+    <button type="button" class="btn alt sm" id="vPdf">Download PDF</button>
+    <button type="button" class="btn red sm" id="vClose">Close</button>
+  </div>
+  <div id="viewMsg" class="msg"></div>
+  <div id="viewBody"></div>
+</div></div>
 <div id="camBox">
   <div id="camTxt"></div>
   <div id="camThumbs" class="thumbs" style="margin:0;justify-content:center;max-height:74px;overflow:hidden"></div>
@@ -905,10 +921,11 @@
         '</td><td data-l="Authority">' + esc(authText(r)) +
         '</td><td data-l="Route">' + esc(r.route) + '</td><td data-l="Stations">' + (r.stations || []).length + '</td><td data-l="Consumption">' + esc(r.cons) +
         '</td><td data-l="End of duty" style="min-width:260px">' + esc(endStatement(r.end)) +
-        '</td><td class="svact"><button class="btn sm" data-sht="' + i + '">Share (WhatsApp)</button><button class="btn alt sm" data-ed="' + i + '">Edit</button><button class="btn red sm" data-dt="' + i + '">Delete</button></td></tr>';
+        '</td><td class="svact"><button class="btn sm" data-sht="' + i + '">Share (WhatsApp)</button><button class="btn alt sm" data-vwt="' + i + '">View</button><button class="btn alt sm" data-ed="' + i + '">Edit</button><button class="btn red sm" data-dt="' + i + '">Delete</button></td></tr>';
     }).join('') || '<tr><td colspan="10" class="hint">No records yet.</td></tr>';
   }
   $('trainList').addEventListener('click', function (e) {
+    var vw = e.target.closest('[data-vwt]'); if (vw) { openView('train', +vw.getAttribute('data-vwt')); return; }
     var sh = e.target.closest('[data-sht]'); if (sh) { shareRecord('train', +sh.getAttribute('data-sht')); return; }
     var ed = e.target.closest('[data-ed]'); if (ed) { loadTrain(+ed.getAttribute('data-ed')); return; }
     var b = e.target.closest('[data-dt]'); if (!b) return;
@@ -1155,11 +1172,12 @@
     $('shuntList').innerHTML = shunts.map(function (r, i) {
       return '<tr class="sv"><td data-l="Date">' + esc(r.date) + '</td><td data-l="Shift">' + esc(r.shift) + '</td><td data-l="Train">' + esc(r.train) + '</td><td data-l="Loco">' + esc(r.loco) + '</td><td data-l="Shunting Master">' + esc(r.master) +
         '</td><td data-l="Movements">' + r.mv.length + '</td><td data-l="End of duty" style="min-width:260px">' + esc(endStatement(r.end)) +
-        '</td><td class="svact"><button class="btn sm" data-shs="' + i + '">Share (WhatsApp)</button><button class="btn alt sm" data-es="' + i + '">Edit</button><button class="btn alt sm" data-dd="' + i + '">Details</button><button class="btn red sm" data-ds="' + i + '">Delete</button></td></tr>' +
+        '</td><td class="svact"><button class="btn sm" data-shs="' + i + '">Share (WhatsApp)</button><button class="btn alt sm" data-vws="' + i + '">View</button><button class="btn alt sm" data-es="' + i + '">Edit</button><button class="btn alt sm" data-dd="' + i + '">Details</button><button class="btn red sm" data-ds="' + i + '">Delete</button></td></tr>' +
         '<tr class="det hidden" id="sdet' + i + '"><td colspan="8">' + shDet(r) + '</td></tr>';
     }).join('') || '<tr><td colspan="8" class="hint">No records yet.</td></tr>';
   }
   $('shuntList').addEventListener('click', function (e) {
+    var vw = e.target.closest('[data-vws]'); if (vw) { openView('shunt', +vw.getAttribute('data-vws')); return; }
     var sh = e.target.closest('[data-shs]'); if (sh) { shareRecord('shunt', +sh.getAttribute('data-shs')); return; }
     var es = e.target.closest('[data-es]'); if (es) { loadShunt(+es.getAttribute('data-es')); return; }
     var d = e.target.closest('[data-dd]');
@@ -1457,39 +1475,121 @@
     return doc;
   }
 
-  var sharing = false;
-  async function shareRecord(kind, i) {
-    var msgId = kind === 'train' ? 'trainMsg' : 'shuntMsg';
-    if (sharing) return;
-    if (!window.jspdf || !window.jspdf.jsPDF) { setMsg(msgId, 'PDF library could not load. Connect to the internet and reload the page.', 'err'); return; }
+  var sharing = false, viewCur = null;
+  function K2(v) { return v ? v + ' KMPH' : ''; }
+  function vKV(rows) {
+    return '<table><tbody>' + rows.map(function (r) { return '<tr><td class="k">' + esc(r[0]) + '</td><td>' + (esc(r[1]) || '-') + '</td></tr>'; }).join('') + '</tbody></table>';
+  }
+  function vTbl(head, rows) {
+    return '<div class="wrap"><table><thead><tr>' + head.map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + (esc(c) || '-') + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>';
+  }
+  function vImgs(a) { return (a && a.length) ? '<div class="thumbs">' + a.map(function (d) { return '<div class="thumb"><img src="' + d + '" alt="photo"></div>'; }).join('') + '</div>' : ''; }
+  function viewHtml(kind, r) {
+    var h = '<h2 style="margin:0">' + (kind === 'train' ? 'Train Movement' : 'Shunting Movement') + '</h2>';
+    if (kind === 'train') {
+      h += '<h3>Journey</h3>' + vKV([['Date', r.date], ['Sign On', r.signon], ['Train', r.train], ['BPC', r.bpc], ['Route', r.route], ['Authority', authText(r)], ['Line No.', r.line]]);
+      h += '<h3>Crew</h3>' + vTbl(['Role', 'Name', 'CUG', 'ID'], [['LP', r.lp_name, r.lp_cug, r.lp_id], ['ALP', r.alp_name, r.alp_cug, r.alp_id], ['TM', r.tm_name, r.tm_cug, r.tm_id]]);
+      h += '<h3>Loco</h3>' + vKV([['Loco No.', r.loco], ['Shed', r.shed], ['Schedule Done', sch(r, 'sdone')], ['Schedule Due', sch(r, 'sdue')], ['CTO', r.cto]]);
+      if (r.bftI || r.bftF || r.bftT || r.bptI || r.bptF || r.bptT)
+        h += '<h3>Brake tests</h3>' + vTbl(['Test', 'Initial Speed', 'Final Speed', 'Time'], [['BFT', K2(r.bftI), K2(r.bftF), r.bftT], ['BPT', K2(r.bptI), K2(r.bptF), r.bptT]]);
+      if (hasT806(r)) {
+        h += '<h3>T806</h3>' + vKV([['Start Time', r.t8start], ['End Time', r.t8end], ['Diff', r.t8diff]]);
+        if ((r.blocks || []).length) h += vTbl(['Type', 'Station', 'No.'], r.blocks.map(function (b) { return [b.type, b.st, b.no]; }));
+      }
+      var sts = r.stations || [];
+      if (sts.length) {
+        h += '<h3>Stations</h3>' + vTbl(['#', 'Station', 'ARR', 'DEP'], sts.map(function (x, i) { return [i + 1, x.name, x.arr, x.dep]; }));
+        var det = sts.filter(function (x) { return x.hArr || x.hDep || x.hLate || x.sLate || x.t1 || x.t2; });
+        if (det.length) h += '<h3>Detention details</h3>' + vTbl(['Station', 'Home ARR', 'Home DEP', 'Home Diff', 'Home Late Off', 'Starter Late Off', 'Type', 'Time 1', 'Time 2', 'T2 - T1'],
+          det.map(function (x) { return [x.name, x.hArr, x.hDep, diffTxt(x.hArr, x.hDep), K2(x.hLate), K2(x.sLate), x.cType, x.t1, x.t2, diffTxt(x.t1, x.t2)]; }));
+      }
+      h += '<h3>Fuel</h3>' + vKV([['Fuel T/O', r.fto], ['Fuel H/O', r.fho], ['Consumption', r.cons]]);
+    } else {
+      var duty = [['Date', r.date], ['Shift', r.shift], ['Sign On', r.signon], ['Shunting Master', r.master], ['Pointsman 1', r.pm1], ['Pointsman 2', r.pm2]];
+      setsTxt(r).forEach(function (t) { duty.push(['Extra staff', t]); });
+      h += '<h3>Duty</h3>' + vKV(duty);
+      h += '<h3>Loco</h3>' + vKV([['Train', r.train], ['Loco No.', r.loco], ['Shed', r.shed], ['Schedule Done', sch(r, 'sdone')], ['Schedule Due', sch(r, 'sdue')]]);
+      if ((r.mv || []).length) h += '<h3>Movement</h3>' + vTbl(['#', 'Line / SH', 'ARR', 'Line / SH', 'DEP', 'Remark'], r.mv.map(function (m, i) { return [i + 1, m.l1, m.arr, m.l2, m.dep, m.remark]; }));
+    }
+    var es = endStatement(r.end);
+    if (es) h += '<h3>' + (r.end.type === 'ho' ? 'Handover' : 'Shutdown / Secured') + '</h3><p style="font-weight:700;padding:10px 12px;border-left:4px solid var(--brand);background:rgba(76,141,255,.12);border-radius:6px">' + esc(es) + '</p>';
+    if (r.end && r.end.photos && r.end.photos.length) h += '<h3>Shutdown / Secured photos</h3>' + vImgs(r.end.photos);
+    if (kind === 'shunt' && r.mPhotos && r.mPhotos.length) h += '<h3>Movement photos</h3>' + vImgs(r.mPhotos);
+    return h;
+  }
+  function openView(kind, i) {
     var r = kind === 'train' ? trains[i] : shunts[i]; if (!r) return;
-    sharing = true; setMsg(msgId, 'Preparing PDF…');
+    viewCur = { kind: kind, i: i };
+    $('viewBody').innerHTML = viewHtml(kind, r); setMsg('viewMsg', '');
+    $('viewBox').classList.add('on'); $('viewBox').scrollTop = 0;
+  }
+  function closeView() { $('viewBox').classList.remove('on'); viewCur = null; }
+  $('vClose').addEventListener('click', closeView);
+  $('viewBox').addEventListener('click', function (e) { if (e.target === this) closeView(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && viewCur) closeView(); });
+  $('vShare').addEventListener('click', function () { if (viewCur) shareRecord(viewCur.kind, viewCur.i); });
+  $('vPdf').addEventListener('click', function () { if (viewCur) downloadRecord(viewCur.kind, viewCur.i); });
+
+  function note(kind, t, cls) {
+    setMsg(kind === 'train' ? 'trainListMsg' : 'shuntListMsg', t, cls);
+    if (viewCur) setMsg('viewMsg', t, cls);
+  }
+  function recMeta(kind, r) {
+    var base = (kind === 'train' ? 'TRAIN_' : 'SHUNTING_') + String(r.train || r.loco || 'RECORD') + '_' + (r.date || '');
+    var text = (kind === 'train' ? 'TRAIN MOVEMENT' : 'SHUNTING MOVEMENT') + ' - ' + S(r.date) +
+      (r.train ? ' - TRAIN ' + r.train : '') + (r.loco ? ' - LOCO ' + r.loco : '') +
+      (kind === 'train' ? (r.lp_name ? ' - LP ' + r.lp_name : '') : (r.master ? ' - SM ' + r.master : ''));
+    var full = text;
+    if (kind === 'train' && (r.stations || []).length) full += '\nROUTE: ' + S(r.route) + '\n' + r.stations.map(function (x) { return x.name + ' ARR ' + S(x.arr) + ' DEP ' + S(x.dep); }).join('\n');
+    if (kind === 'shunt' && (r.mv || []).length) full += '\n' + r.mv.map(function (m, i) { return (i + 1) + ') ' + S(m.l1) + ' ARR ' + S(m.arr) + ' / ' + S(m.l2) + ' DEP ' + S(m.dep); }).join('\n');
+    var es = endStatement(r.end); if (es) full += '\n' + es;
+    return { name: base.replace(/[^A-Za-z0-9_-]+/g, '_') + '.pdf', text: text, full: full };
+  }
+  async function buildPdf(kind, r) {
+    if (!window.jspdf || !window.jspdf.jsPDF) throw new Error('PDF library could not load (internet needed)');
+    return kind === 'train' ? await trainPdf(r) : await shuntPdf(r);
+  }
+  function saveBlob(blob, name) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+  }
+  async function downloadRecord(kind, i) {
+    var r = kind === 'train' ? trains[i] : shunts[i]; if (!r || sharing) return;
+    sharing = true; note(kind, 'Preparing PDF…');
+    try { var m = recMeta(kind, r), doc = await buildPdf(kind, r); saveBlob(doc.output('blob'), m.name); note(kind, 'PDF downloaded (' + m.name + ').', 'ok'); }
+    catch (e) { note(kind, 'Could not create the PDF: ' + (e && e.message ? e.message : e), 'err'); }
+    sharing = false;
+  }
+  async function shareRecord(kind, i) {
+    if (sharing) return;
+    var r = kind === 'train' ? trains[i] : shunts[i]; if (!r) return;
+    var m = recMeta(kind, r);
+    sharing = true; note(kind, 'Preparing PDF…');
     try {
-      var doc = kind === 'train' ? await trainPdf(r) : await shuntPdf(r);
-      var base = (kind === 'train' ? 'TRAIN_' : 'SHUNTING_') + String(r.train || r.loco || 'RECORD') + '_' + (r.date || '');
-      var name = base.replace(/[^A-Za-z0-9_-]+/g, '_') + '.pdf';
-      var blob = doc.output('blob');
-      var text = (kind === 'train' ? 'TRAIN MOVEMENT' : 'SHUNTING MOVEMENT') + ' - ' + S(r.date) +
-        (r.train ? ' - TRAIN ' + r.train : '') + (r.loco ? ' - LOCO ' + r.loco : '') +
-        (kind === 'train' ? (r.lp_name ? ' - LP ' + r.lp_name : '') : (r.master ? ' - SM ' + r.master : ''));
-      var file = new File([blob], name, { type: 'application/pdf' });
+      var doc = await buildPdf(kind, r), blob = doc.output('blob');
+      var file = new File([blob], m.name, { type: 'application/pdf' });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         try {
-          await navigator.share({ files: [file], title: name, text: text });
-          setMsg(msgId, 'Shared. Choose WhatsApp in the share sheet next time too.', 'ok');
-          sharing = false; return;
+          await navigator.share({ files: [file], title: m.name, text: m.text });
+          note(kind, 'Shared.', 'ok'); sharing = false; return;
         } catch (e) {
-          if (e && e.name === 'AbortError') { setMsg(msgId, ''); sharing = false; return; }
+          if (e && e.name === 'AbortError') { note(kind, ''); sharing = false; return; }
         }
       }
-      // fallback: download the PDF, open WhatsApp with a text summary
-      var a = document.createElement('a');
-      a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
-      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
-      window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
-      setMsg(msgId, 'PDF downloaded (' + name + '). In WhatsApp, attach this file to send it.', 'ok');
+      saveBlob(blob, m.name);
+      window.open('https://wa.me/?text=' + encodeURIComponent(m.text), '_blank');
+      note(kind, 'PDF downloaded (' + m.name + '). In WhatsApp, attach this file to send it.', 'ok');
     } catch (e) {
-      setMsg(msgId, 'Could not create the PDF: ' + (e && e.message ? e.message : e), 'err');
+      /* PDF failed: share a plain-text summary instead so sharing still works */
+      var why = e && e.message ? e.message : String(e);
+      try {
+        if (navigator.share) { await navigator.share({ text: m.full }); note(kind, 'PDF failed (' + why + '). Shared a text summary instead.', 'err'); }
+        else { window.open('https://wa.me/?text=' + encodeURIComponent(m.full), '_blank'); note(kind, 'PDF failed (' + why + '). Opened WhatsApp with a text summary instead.', 'err'); }
+      } catch (e2) {
+        if (e2 && e2.name === 'AbortError') note(kind, ''); else note(kind, 'Could not share: ' + why, 'err');
+      }
     }
     sharing = false;
   }
