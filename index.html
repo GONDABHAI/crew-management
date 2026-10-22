@@ -52,21 +52,83 @@
   .diff { font-weight:600; padding-top:8px; }
   .chk { display:flex; align-items:center; gap:8px; font-size:.95rem; color:var(--ink); border:1px solid var(--line); border-radius:8px; padding:9px 10px; background:#fafbfe; margin:0; cursor:pointer; }
   .chk input { width:auto; margin:0; }
-  .grid.compact { grid-template-columns:repeat(auto-fit,minmax(104px,1fr)); gap:8px; }
-  .grid.compact input, .grid.compact select { padding:6px 8px; font-size:.9rem; }
-  #toast { position:fixed; left:50%; bottom:22px; transform:translateX(-50%); max-width:92vw; background:#1c2433; color:#fff; padding:11px 18px; border-radius:10px; font-size:.95rem; z-index:10001; display:none; box-shadow:0 6px 20px rgba(0,0,0,.3); }
-  #toast.show { display:block; } #toast.err { background:#b42318; } #toast.ok { background:#067647; }
-  #viewBox { position:fixed; inset:0; background:rgba(15,23,42,.65); z-index:9998; display:none; align-items:flex-start; justify-content:center; padding:14px; overflow:auto; }
-  #viewBox.on { display:flex; }
-  .vwrap { background:#fff; border-radius:14px; width:100%; max-width:900px; padding:16px; }
-  .vbar { display:flex; align-items:center; gap:10px; margin-bottom:10px; } .vbar b { flex:1; font-size:1.1rem; color:var(--brand); }
-  .vact { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; position:sticky; bottom:0; background:#fff; padding-top:8px; }
-  .vact a.btn { text-decoration:none; display:inline-block; }
-  .vkv { width:100%; margin-bottom:10px; } .vkv th { width:38%; background:#f0f3f9; font-weight:600; font-size:.85rem; } .vkv td { white-space:normal; }
-  .vsec { margin:14px 0 6px; font-weight:700; color:var(--brand); font-size:.95rem; }
-  .vstmt { background:#eef3ff; border-left:4px solid var(--brand); padding:10px 12px; border-radius:6px; }
   .tcell { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
   .tcell input { min-width:110px; }
+  @media (max-width:640px) {
+    main { padding:0 8px 30px; }
+    #mvTable thead { display:none; }
+    #mvTable, #mvTable tbody { display:block; width:100%; }
+    #mvTable tr.mvr { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:10px 8px 0; margin-top:10px; background:#f7f9ff; border:1px solid var(--line); border-bottom:0; border-radius:10px 10px 0 0; }
+    #mvTable tr.mvrem { display:block; padding:6px 8px 10px; background:#f7f9ff; border:1px solid var(--line); border-top:0; border-radius:0 0 10px 10px; }
+    #mvTable td { display:block; border:0; padding:0; min-width:0; }
+    #mvTable tr.mvr td:nth-child(1) { order:0; grid-column:1; font-weight:700; align-self:center; }
+    #mvTable tr.mvr td:nth-child(6) { order:1; grid-column:2; text-align:right; }
+    #mvTable tr.mvr td:nth-child(2) { order:2; } #mvTable tr.mvr td:nth-child(3) { order:3; }
+    #mvTable tr.mvr td:nth-child(4) { order:4; } #mvTable tr.mvr td:nth-child(5) { order:5; }
+    #mvTable tr.mvr td[data-l]::before { content:attr(data-l); display:block; font-size:.78rem; color:var(--muted); margin-bottom:3px; }
+    #mvTable tr.mvrem td:first-child { display:none; }
+    #stTable thead { display:none; }
+    #stTable, #stTable tbody { display:block; width:100%; }
+    #stTable tr.str { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; padding:10px 8px 0; margin-top:10px; background:#f7f9ff; border:1px solid var(--line); border-bottom:0; border-radius:10px 10px 0 0; }
+    #stTable tr.stdb { display:block; padding:8px 8px 10px; background:#f7f9ff; border:1px solid var(--line); border-top:0; border-radius:0 0 10px 10px; }
+    #stTable tr.det { display:block; padding:8px; margin-top:-1px; background:#fff; border:1px solid var(--line); border-radius:10px; }
+    #stTable tr.det.hidden { display:none !important; }
+    #stTable td { display:block; border:0; padding:0; min-width:0; }
+    #stTable tr.str td:nth-child(1) { order:0; grid-column:1 / 3; font-weight:700; align-self:center; }
+    #stTable tr.str td:nth-child(5) { order:1; grid-column:3; text-align:right; }
+    #stTable tr.str td:nth-child(2) { order:2; }
+    #stTable tr.str td:nth-child(3) { order:3; } #stTable tr.str td:nth-child(4) { order:4; }
+    #stTable tr.str td[data-l]::before { content:attr(data-l); display:block; font-size:.78rem; color:var(--muted); margin-bottom:3px; }
+    #stTable tr.stdb td:first-child, #stTable tr.det td:first-child { display:none; }
+    #stTable tr.str td .stname { max-width:none; min-width:0; width:100%; box-sizing:border-box; }
+    #stTable tr.str input[type=time] { min-width:0; width:100%; box-sizing:border-box; padding:7px 3px; font-size:.78rem; }
+    #stTable tr.str td[data-l]::before { font-size:.72rem; }
+    #stTable tr.str input { font-size:.85rem; padding:7px 5px; }
+    #stTable tr.str input[type=time]::-webkit-calendar-picker-indicator { display:none; }
+    #stTable .tcell { flex-direction:column; align-items:stretch; gap:5px; }
+    #stTable .tcell .btn { width:100%; padding:5px 2px; font-size:.78rem; }
+    #stTable td input { min-width:0; }
+    #stTable .tcell input { flex:1 1 auto; min-width:0; }
+    #trainTable thead, #shuntTable thead { display:none; }
+    #trainTable, #trainTable tbody, #shuntTable, #shuntTable tbody { display:block; width:100%; }
+    #trainTable tr.sv, #shuntTable tr.sv { display:block; padding:10px; margin-top:10px; background:#f7f9ff; border:1px solid var(--line); border-radius:10px; }
+    #trainTable tr.sv td, #shuntTable tr.sv td { display:flex; justify-content:space-between; gap:10px; border:0; padding:3px 0; min-width:0 !important; white-space:normal; }
+    #trainTable tr.sv td[data-l]::before, #shuntTable tr.sv td[data-l]::before { content:attr(data-l); flex:0 0 34%; font-size:.78rem; color:var(--muted); }
+    #trainTable tr.sv td.svact, #shuntTable tr.sv td.svact { flex-wrap:wrap; gap:6px; justify-content:flex-start; padding-top:8px; }
+    #trainTable .svact .btn, #shuntTable .svact .btn { margin:0; }
+    #shuntTable tr.det { display:block; padding:8px; margin-top:-1px; background:#fff; border:1px solid var(--line); border-radius:10px; }
+    #shuntTable tr.det.hidden { display:none !important; }
+    #shuntTable tr.det td { display:block; border:0; padding:0; overflow-x:auto; }
+    #mvTable td input { min-width:0; }
+    #mvTable .tcell { flex-wrap:nowrap; }
+    #mvTable .tcell input { flex:1 1 auto; min-width:0; }
+    #mvTable .tcell .btn { flex:0 0 auto; }
+  }
+  .schrow { display:flex; flex-wrap:nowrap; gap:10px; align-items:flex-end; }
+  .schrow > div:first-child { flex:0 0 110px; }
+  .schrow > div:last-child { flex:1 1 auto; min-width:0; }
+  .schrow select { width:100%; min-width:0 !important; height:38px; box-sizing:border-box; }
+  .schrow .tcell { flex-wrap:nowrap; }
+  .schrow .tcell input { min-width:0; height:38px; box-sizing:border-box; }
+  .schrow > div > input { height:38px; box-sizing:border-box; }
+  .schrow .tcell .btn { height:38px; margin:0; white-space:nowrap; flex:0 0 auto; }
+  #stTable .stname { max-width:150px; min-width:110px; }
+  #stTable .tcell { flex-wrap:nowrap; }
+  #stTable .tcell input { min-width:90px; }
+  #stTable .tcell .btn { flex:0 0 auto; white-space:nowrap; }
+  #stTable tr.stdb td { border-bottom:0; padding-top:0; }
+  .pair { display:flex; flex-wrap:nowrap; gap:10px; align-items:flex-end; }
+  .pair > div { flex:1 1 0; min-width:0; }
+  .pair > div:first-child { flex:0 0 34%; }
+  .pair input[type=time] { padding:7px 4px; font-size:.85rem; }
+  .pair input[type=time]::-webkit-calendar-picker-indicator { display:none; }
+  .pair input { box-sizing:border-box; height:38px; min-width:0; }
+  .pair .tcell { flex-wrap:nowrap; }
+  .pair .tcell input { min-width:0; flex:1 1 auto; }
+  .pair .tcell .btn { flex:0 0 auto; height:38px; }
+  .editbar { background:#fff7e0; border:1px solid #f0c36d; color:#6b4a00; border-radius:8px; padding:8px 10px; margin:0 0 12px; font-size:.9rem; }
+  .svact { white-space:nowrap; }
+  .svact .btn { margin-right:6px; }
   .rowx { display:flex; align-items:flex-end; gap:6px; }
   .rowx > div { flex:1; }
   .thumbs { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
@@ -79,16 +141,44 @@
   #camVideo { max-width:100%; max-height:70vh; border-radius:10px; background:#000; }
   #camBar { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
   #camBar .btn { font-size:1rem; padding:11px 20px; }
-  #camTxt { color:#fff; font-size:.9rem; }
+  #camTxt { color:#fff; font-size:.9rem; text-align:center; }
+  #camThumbs .thumb img { height:56px; }
+  #camBox.flash #camVideo { opacity:.35; }
   .tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
   .tab { background:#fff; color:var(--brand); border:1px solid var(--brand); border-radius:8px; padding:9px 16px; font-size:.95rem; cursor:pointer; }
   .tab.active { background:var(--brand); color:#fff; }
+
+  /* ---------- dark theme ---------- */
+  html.dark { color-scheme:dark; --bg:#0e131b; --card:#171e29; --ink:#e7ebf3; --muted:#9aa6ba; --brand:#4c8dff; --line:#2b3546; --err:#ff7a70; --ok:#4cd694; }
+  html.dark header { background:#1c3a8f; }
+  html.dark input, html.dark select, html.dark textarea { background:#0f1621; color:var(--ink); border-color:#3a475b; }
+  html.dark input[readonly] { background:#1a2332; }
+  html.dark input::placeholder, html.dark textarea::placeholder { color:#6f7c91; }
+  html.dark .group, html.dark .chk { background:#121a26; }
+  html.dark th { background:#202b3b; }
+  html.dark tr.det td { background:#121a26; }
+  html.dark code { background:#232e3f; }
+  html.dark .drop { border-color:#3a475b; }
+  html.dark .drop.over { background:#16233a; }
+  html.dark .btn { color:#fff; }
+  html.dark .btn.alt, html.dark .tab { background:transparent; color:var(--brand); }
+  html.dark .btn.red { background:transparent; color:var(--err); }
+  html.dark .tab.active { background:var(--brand); color:#fff; }
+  html.dark .tile:hover { box-shadow:0 6px 16px rgba(76,141,255,.25); }
+  html.dark .thumb button { background:#171e29; }
+  html.dark .editbar { background:#3a2f12; border-color:#8a6d1f; color:#f3d98b; }
+  html.dark #camBar .btn.red { background:#fff !important; color:#b42318; }
+  html.dark #mvTable tr.mvr, html.dark #mvTable tr.mvrem, html.dark #stTable tr.str, html.dark #stTable tr.stdb,
+  html.dark #trainTable tr.sv, html.dark #shuntTable tr.sv { background:#121a26; }
+  html.dark #stTable tr.det, html.dark #shuntTable tr.det { background:#171e29; }
+  html.dark [id$="_stmt"] { background:#16233a !important; }
 </style>
 </head>
 <body>
 <header>
   <h1>Crew Management</h1>
   <span id="saveStat" class="hint" style="color:#fff;opacity:.85;margin:0"></span>
+  <button id="themeBtn" type="button">&#127769; Dark theme</button>
   <button id="homeBtn" class="hidden" data-go="home">&#8592; Main Page</button>
 </header>
 
@@ -108,9 +198,10 @@
 <section class="view" id="v-train">
   <div class="card">
     <h2>Train Movement</h2>
+    <div id="trainEditBar" class="editbar hidden">&#9998; Editing a saved record. Change what you need, then press <b>Update Train Movement</b>.</div>
     <div class="grid">
       <div><label>Date</label><input id="t_date" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" data-date="1"></div>
-      <div><label>Sign On</label><input type="time" id="t_signon"></div>
+      <div><label>Sign On</label><div class="tcell"><input type="time" id="t_signon"><button type="button" class="btn alt sm" data-nowfill="t_signon">Auto fill</button></div></div>
     </div>
     <div class="persons" id="persons"></div>
   </div>
@@ -120,32 +211,34 @@
     <div class="grid">
       <div><label>Loco No.</label><input id="t_loco" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
       <div><label>Shed</label><input id="t_shed"></div>
-      <div style="grid-column:1/-1"><label>Schedule Done (TI / IA / IB / IC / TOH / IOH / POH - Date)</label><div class="tcell"><select id="t_sdoneK" style="min-width:90px"><option value="">-- TYPE --</option><option>TI</option><option>IA</option><option>IB</option><option>IC</option><option>TOH</option><option>IOH</option><option>POH</option></select><input id="t_sdone" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" data-date="1"></div></div>
-      <div style="grid-column:1/-1"><label>Schedule Due (TI / IA / IB / IC / TOH / IOH / POH - Date)</label><div class="tcell"><select id="t_sdueK" style="min-width:90px"><option value="">-- TYPE --</option><option>TI</option><option>IA</option><option>IB</option><option>IC</option><option>TOH</option><option>IOH</option><option>POH</option></select><input id="t_sdue" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" data-date="1"><button type="button" class="btn alt sm" data-duecalc="t_" title="Auto calculate (only when Done and Due type are the same): TI 45, IA 90, IB 180, IC 270 days">Auto</button></div></div>
-      <div><label>CTO (time)</label><input type="time" id="t_cto"></div>
+      <div class="schrow" style="grid-column:1/-1"><div><label>Schedule Done</label><select id="t_sdoneK" style="min-width:90px"><option value="">-- TYPE --</option><option>TI</option><option>IA</option><option>IB</option><option>IC</option><option>TOH</option><option>IOH</option><option>POH</option></select></div><div><label>Schedule Done Date</label><div class="tcell"><input id="t_sdone" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" data-date="1"></div></div></div>
+      <div class="schrow" style="grid-column:1/-1"><div><label>Schedule Due</label><select id="t_sdueK" style="min-width:90px"><option value="">-- TYPE --</option><option>TI</option><option>IA</option><option>IB</option><option>IC</option><option>TOH</option><option>IOH</option><option>POH</option></select></div><div><label>Schedule Due Date</label><div class="tcell"><input id="t_sdue" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" data-date="1"><button type="button" class="btn alt sm" data-duecalc="t_" title="Auto calculate (only when Done and Due type are the same): TI 45, IA 90, IB 180, IC 270 days">Auto</button></div></div></div>
+      <div><label>CTO (time)</label><div class="tcell"><input type="time" id="t_cto"><button type="button" class="btn alt sm" data-nowfill="t_cto">Auto fill</button></div></div>
       <div><label>Line No.</label><input id="t_line" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
     </div>
   </div>
 
   <div class="card">
     <h3>Train details</h3>
-    <div class="grid compact">
+    <div class="grid">
       <div><label>Train</label><input id="t_train"></div>
       <div><label>BPC</label><input id="t_bpc" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
-    </div>
-    <div style="margin-top:10px"><label>Route Select</label><select id="t_route"></select></div>
-    <div class="grid compact" style="margin-top:10px">
-      <div><label>Authority</label>
-        <select id="t_auth"><option value="T409">T409</option><option value="T806">T806</option><option value="Other">Other</option></select>
+      <div style="grid-column:1/-1"><label>Route Select</label><select id="t_route"></select></div>
+      <div class="schrow" style="grid-column:1/-1">
+        <div><label>Authority</label>
+          <select id="t_auth"><option value="T409">T409</option><option value="T806">T806</option><option value="Other">Other</option></select>
+        </div>
+        <div><label>No.</label><input id="t_formno" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
       </div>
-      <div id="authOtherBox" class="hidden"><label>Authority (other)</label><input id="t_authOther"></div>
-      <div><label>No.</label><input id="t_formno" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
+      <div id="authOtherBox" class="hidden" style="grid-column:1/-1"><label>Authority (other)</label><input id="t_authOther"></div>
+      <div id="moreAuth" style="grid-column:1/-1"></div>
+      <div style="grid-column:1/-1"><button type="button" class="btn alt sm" id="addAuth">+ Add more authority</button></div>
     </div>
-        <div id="t806Box" class="group hidden" style="margin-top:10px;padding:8px">
-      <h3 style="margin-bottom:6px">T806 details</h3>
-      <div class="grid compact">
-        <div><label>Start Time</label><input type="time" id="t_t8start"></div>
-        <div><label>End Time</label><input type="time" id="t_t8end"></div>
+    <div id="t806Box" class="group hidden" style="margin-top:12px">
+      <h3>T806 details</h3>
+      <div class="grid">
+        <div><label>Start Time</label><div class="tcell"><input type="time" id="t_t8start"><button type="button" class="btn alt sm" data-nowfill="t_t8start">Auto fill</button></div></div>
+        <div><label>End Time</label><div class="tcell"><input type="time" id="t_t8end"><button type="button" class="btn alt sm" data-nowfill="t_t8end">Auto fill</button></div></div>
         <div><label>Diff (Start &rarr; End)</label><div class="diff" id="t8diff"></div></div>
       </div>
       <div class="wrap" style="margin-top:12px"><table>
@@ -157,30 +250,24 @@
   </div>
 
   <div class="card">
-    <h3>BFT / BPT</h3>
-    <div class="group">
-      <h3 style="margin-bottom:6px">BFT</h3>
-      <div class="grid compact">
-        <div><label>Initial speed (km/h)</label><input id="t_bftinit" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
-        <div><label>Final speed (km/h)</label><input id="t_bftfinal" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
-        <div><label>Time</label><div class="tcell"><input type="time" id="t_bfttime"><button type="button" class="btn alt sm" data-endnow="t_bfttime">Now</button></div></div>
-      </div>
-    </div>
-    <div class="group" style="margin-top:10px">
-      <h3 style="margin-bottom:6px">BPT</h3>
-      <div class="grid compact">
-        <div><label>Initial speed (km/h)</label><input id="t_bptinit" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
-        <div><label>Final speed (km/h)</label><input id="t_bptfinal" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
-        <div><label>Time</label><div class="tcell"><input type="time" id="t_bpttime"><button type="button" class="btn alt sm" data-endnow="t_bpttime">Now</button></div></div>
-      </div>
-    </div>
+    <h3>Brake tests (BFT / BPT)</h3>
+    <div class="group"><h3>BFT</h3><div class="grid">
+      <div><label>BFT Initial Speed (KMPH)</label><input id="t_bftI" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
+      <div><label>BFT Final Speed (KMPH)</label><input id="t_bftF" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
+      <div><label>Time</label><div class="tcell"><input type="time" id="t_bftT"><button type="button" class="btn alt sm" data-nowfill="t_bftT">Auto fill</button></div></div>
+    </div></div>
+    <div class="group" style="margin-top:10px"><h3>BPT</h3><div class="grid">
+      <div><label>BPT Initial Speed (KMPH)</label><input id="t_bptI" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
+      <div><label>BPT Final Speed (KMPH)</label><input id="t_bptF" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
+      <div><label>Time</label><div class="tcell"><input type="time" id="t_bptT"><button type="button" class="btn alt sm" data-nowfill="t_bptT">Auto fill</button></div></div>
+    </div></div>
   </div>
 
   <div class="card">
     <h3>Stations</h3>
     <div class="wrap">
-      <table>
-        <thead><tr><th>#</th><th>Station Name</th><th>ARR</th><th>DEP</th><th>Detention</th><th></th></tr></thead>
+      <table id="stTable">
+        <thead><tr><th>#</th><th>Station Name</th><th>ARR</th><th>DEP</th><th></th></tr></thead>
         <tbody id="stBody"></tbody>
       </table>
     </div>
@@ -210,7 +297,7 @@
 
   <div class="card">
     <h2>Saved Train Movements</h2>
-    <div class="wrap"><table>
+    <div class="wrap"><table id="trainTable">
       <thead><tr><th>Date</th><th>Train</th><th>Loco</th><th>LP</th><th>Authority</th><th>Route</th><th>Stations</th><th>Consumption</th><th>End of duty</th><th></th></tr></thead>
       <tbody id="trainList"></tbody></table></div>
   </div>
@@ -220,11 +307,12 @@
 <section class="view" id="v-shunt">
   <div class="card">
     <h2>Shunting Movement</h2>
+    <div id="shuntEditBar" class="editbar hidden">&#9998; Editing a saved record. Change what you need, then press <b>Update Shunting Movement</b>.</div>
     <div class="grid">
       <div><label>Date</label><input id="s_date" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" data-date="1"></div>
       <div><label>Shift</label>
         <select id="s_shift"><option value="">-- Select --</option><option value="7-15">7 - 15</option><option value="15-23">15 - 23</option><option value="23-7">23 - 7</option></select></div>
-      <div><label>Sign On</label><input type="time" id="s_signon"></div>
+      <div><label>Sign On</label><div class="tcell"><input type="time" id="s_signon"><button type="button" class="btn alt sm" data-nowfill="s_signon">Auto fill</button></div></div>
       <div><label>Shunting Master</label><input id="s_master" list="staffList" autocomplete="off"></div>
       <div><label>Pointsman 1</label><input id="s_pm1" list="staffList" autocomplete="off"></div>
       <div><label>Pointsman 2</label><input id="s_pm2" list="staffList" autocomplete="off"></div>
@@ -239,8 +327,8 @@
       <div><label>Train</label><input id="s_train"></div>
       <div><label>Loco No.</label><input id="s_loco" inputmode="numeric" pattern="[0-9]*" data-num="1"></div>
       <div><label>Shed</label><input id="s_shed"></div>
-      <div style="grid-column:1/-1"><label>Schedule Done (TI / IA / IB / IC / TOH / IOH / POH - Date)</label><div class="tcell"><select id="s_sdoneK" style="min-width:90px"><option value="">-- TYPE --</option><option>TI</option><option>IA</option><option>IB</option><option>IC</option><option>TOH</option><option>IOH</option><option>POH</option></select><input id="s_sdone" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" data-date="1"></div></div>
-      <div style="grid-column:1/-1"><label>Schedule Due (TI / IA / IB / IC / TOH / IOH / POH - Date)</label><div class="tcell"><select id="s_sdueK" style="min-width:90px"><option value="">-- TYPE --</option><option>TI</option><option>IA</option><option>IB</option><option>IC</option><option>TOH</option><option>IOH</option><option>POH</option></select><input id="s_sdue" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" data-date="1"><button type="button" class="btn alt sm" data-duecalc="s_" title="Auto calculate (only when Done and Due type are the same): TI 45, IA 90, IB 180, IC 270 days">Auto</button></div></div>
+      <div class="schrow" style="grid-column:1/-1"><div><label>Schedule Done</label><select id="s_sdoneK" style="min-width:90px"><option value="">-- TYPE --</option><option>TI</option><option>IA</option><option>IB</option><option>IC</option><option>TOH</option><option>IOH</option><option>POH</option></select></div><div><label>Schedule Done Date</label><div class="tcell"><input id="s_sdone" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" data-date="1"></div></div></div>
+      <div class="schrow" style="grid-column:1/-1"><div><label>Schedule Due</label><select id="s_sdueK" style="min-width:90px"><option value="">-- TYPE --</option><option>TI</option><option>IA</option><option>IB</option><option>IC</option><option>TOH</option><option>IOH</option><option>POH</option></select></div><div><label>Schedule Due Date</label><div class="tcell"><input id="s_sdue" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" data-date="1"><button type="button" class="btn alt sm" data-duecalc="s_" title="Auto calculate (only when Done and Due type are the same): TI 45, IA 90, IB 180, IC 270 days">Auto</button></div></div></div>
     </div>
   </div>
 
@@ -254,12 +342,12 @@
 
   <div class="card">
     <h3>Movement Table</h3>
-    <div class="wrap"><table>
-      <thead><tr><th>#</th><th>Line / SH</th><th>ARR</th><th>Line / SH</th><th>DEP</th><th>Remark</th><th></th></tr></thead>
+    <div class="wrap"><table id="mvTable">
+      <thead><tr><th>#</th><th>Line / SH</th><th>ARR</th><th>Line / SH</th><th>DEP</th><th></th></tr></thead>
       <tbody id="mvBody"></tbody>
     </table></div>
     <div class="actions"><button type="button" class="btn alt sm" id="addMv">+ Add more</button>
-      <span class="hint">Click an empty time box (or tap <b>Now</b>) to fill the current time.</span></div>
+      <span class="hint">Click an empty time box (or tap <b>Auto fill</b>) to fill the current time.</span></div>
   </div>
 
   <div class="card">
@@ -274,7 +362,7 @@
 
   <div class="card">
     <h2>Saved Shunting Movements</h2>
-    <div class="wrap"><table>
+    <div class="wrap"><table id="shuntTable">
       <thead><tr><th>Date</th><th>Shift</th><th>Train</th><th>Loco</th><th>Shunting Master</th><th>Movements</th><th>End of duty</th><th></th></tr></thead>
       <tbody id="shuntList"></tbody></table></div>
   </div>
@@ -296,7 +384,7 @@
       <input type="file" id="file" accept=".xlsx,.xls,.xlsm">
       <div id="fname" class="hint"></div>
     </div>
-    <p class="hint">Excel file (.xlsx / .xls) with columns in the order <code>NAME | CUG | ID</code>. First sheet is read; a header row is optional. LP, ALP and TM each keep their own list (saved in this browser); each list is used to autofill that role in Train Movement.</p>
+    <p class="hint">Excel file (.xlsx / .xls) with columns in the order <code>NAME | CUG | ID</code>. First sheet is read; a header row is optional. New uploads are <b>added</b> to the saved list (nothing is deleted); a row with an already-saved ID just updates that person. LP, ALP and TM each keep their own list (saved in this browser); each list is used to autofill that role in Train Movement.</p>
     <div id="crewMsg" class="msg"></div>
   </div>
   <div class="card">
@@ -354,6 +442,8 @@
 
 <div id="camBox">
   <div id="camTxt"></div>
+  <div id="camThumbs" class="thumbs" style="margin:0;justify-content:center;max-height:74px;overflow:hidden"></div>
+  <input type="file" id="camApp" accept="image/*" capture="environment">
   <video id="camVideo" autoplay playsinline muted></video>
   <div id="camBar">
     <button type="button" class="btn" id="camShot">&#128247; Capture</button>
@@ -361,22 +451,11 @@
     <button type="button" class="btn red" id="camClose" style="background:#fff">Done</button>
   </div>
 </div>
-<div id="toast"></div>
-<div id="viewBox"><div class="vwrap">
-  <div class="vbar"><b id="viewTitle">Saved log</b><button type="button" class="btn red sm" id="viewClose">&#10005; Close</button></div>
-  <div id="viewBody"></div>
-  <div class="vact">
-    <button type="button" class="btn" id="vShare">Share PDF (WhatsApp)</button>
-    <a class="btn alt" id="vWa" target="_blank" rel="noopener noreferrer">Send text on WhatsApp</a>
-    <button type="button" class="btn alt" id="vCopy">Copy text</button>
-    <button type="button" class="btn alt" id="vPdf">Download PDF</button>
-  </div>
-</div></div>
-<datalist id="routeStationList"></datalist>
 <datalist id="crewList_lp"></datalist>
 <datalist id="crewList_alp"></datalist>
 <datalist id="crewList_tm"></datalist>
 <datalist id="staffList"></datalist>
+<datalist id="routeStations"></datalist>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -386,6 +465,13 @@
   var $ = function (id) { return document.getElementById(id); };
   function load(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
   function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+  function setTheme(d) {
+    document.documentElement.classList.toggle('dark', d);
+    $('themeBtn').textContent = d ? '\u2600 Light theme' : '\uD83C\uDF19 Dark theme';
+    try { localStorage.setItem('theme', d ? 'dark' : 'light'); } catch (e) {}
+  }
+  $('themeBtn').addEventListener('click', function () { setTheme(!document.documentElement.classList.contains('dark')); });
+  try { if (localStorage.getItem('theme') === 'dark') setTheme(true); } catch (e) {}
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function today() { var d = new Date(); return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear(); }
@@ -404,7 +490,7 @@
   var crew = load('crew3', null) || { lp: load('crew', []), alp: [], tm: [] }, cat = 'lp',
       CN = { lp: 'LP', alp: 'ALP', tm: 'TM' }, routes = load('routes', []), staff = load('sstaff', []),
       trains = load('trains', []), shunts = load('shunts2', []);
-  var st = [];
+  var st = [], xa = [], endPh = { te: [], se: [] };
   var curView = 'home';
   [trains, shunts].forEach(function (list) { list.forEach(function (r) { ['date', 'sdone', 'sdue'].forEach(function (f) { r[f] = fd(r[f]); }); (r.stations || []).forEach(function (x) { ['hLate', 'sLate'].forEach(function (k) { if (x[k] && /\D/.test(x[k])) x[k] = ''; }); }); }); });
 
@@ -452,7 +538,7 @@
 
   $('t_auth').addEventListener('change', function () {
     $('authOtherBox').classList.toggle('hidden', this.value !== 'Other');
-    $('t806Box').classList.toggle('hidden', this.value !== 'T806');
+    updT806();
   });
   function t8Diff() { $('t8diff').textContent = diffTxt($('t_t8start').value, $('t_t8end').value); }
   ['t_t8start', 't_t8end'].forEach(function (id) {
@@ -469,7 +555,7 @@
       var o = ['Block Back', 'Block Forward'].map(function (t) { return '<option' + (b.type === t ? ' selected' : '') + '>' + t + '</option>'; }).join('');
       return '<tr><td>' + (i + 1) + '</td>' +
         '<td><select data-i="' + i + '" data-f="type">' + o + '</select></td>' +
-        '<td><input list="routeStationList" autocomplete="off" data-i="' + i + '" data-f="st" value="' + esc(b.st) + '"></td>' +
+        '<td><input data-i="' + i + '" data-f="st" list="routeStations" autocomplete="off" value="' + esc(b.st) + '"></td>' +
         '<td><input data-i="' + i + '" data-f="no" value="' + esc(b.no) + '"></td>' +
         '<td><button type="button" class="btn red sm" data-bd="' + i + '">&#10005;</button></td></tr>';
     }).join('');
@@ -515,34 +601,37 @@
   $('addStation').addEventListener('click', function () { st.push(blank('')); renderStations(); });
 
   function fld(i, f, label, type) {
-    return '<div><label>' + label + '</label><input type="' + (type || 'time') + '" data-i="' + i + '" data-f="' + f + '" value="' + esc(st[i][f]) + '"></div>';
+    var inp = '<input type="' + (type || 'time') + '" data-i="' + i + '" data-f="' + f + '" value="' + esc(st[i][f]) + '">';
+    if (!type || type === 'time') inp = '<div class="tcell">' + inp + '<button type="button" class="btn alt sm" data-fill="' + f + '">Auto fill</button></div>';
+    return '<div><label>' + label + '</label>' + inp + '</div>';
   }
   function spd(i, f, label) {
-    return '<div><label>' + label + ' (km/h)</label><input inputmode="numeric" pattern="[0-9]*" data-num="1" data-i="' + i + '" data-f="' + f + '" value="' + esc(st[i][f]) + '"></div>';
+    return '<div><label>' + label + ' (KMPH)</label><input inputmode="numeric" pattern="[0-9]*" data-num="1" data-i="' + i + '" data-f="' + f + '" value="' + esc(st[i][f]) + '"></div>';
   }
   function cleanSpeed(x) { ['hLate', 'sLate'].forEach(function (k) { if (x[k] && /\D/.test(x[k])) x[k] = ''; }); }
-  function updateRouteStationList() {
+  function refreshStationSuggest() {
     var seen = {}, out = [];
-    var rt = $('t_route').value !== '' && routes[+$('t_route').value] ? routes[+$('t_route').value].stations : [];
-    rt.concat(st.map(function (x) { return x.name; })).forEach(function (n) { n = (n || '').trim(); if (n && !seen[n]) { seen[n] = 1; out.push(n); } });
-    $('routeStationList').innerHTML = out.map(function (n) { return '<option value="' + esc(n) + '">'; }).join('');
+    st.forEach(function (x) { var n = (x.name || '').trim(); if (n && !seen[n.toUpperCase()]) { seen[n.toUpperCase()] = 1; out.push(n); } });
+    $('routeStations').innerHTML = out.map(function (n) { return '<option value="' + esc(n) + '"></option>'; }).join('');
   }
   function renderStations() {
-    st.forEach(cleanSpeed); updateRouteStationList();
+    st.forEach(cleanSpeed);
+    refreshStationSuggest();
     $('stEmpty').classList.toggle('hidden', st.length > 0);
     $('stBody').innerHTML = st.map(function (s, i) {
       var o = ['CRO', 'MRO', 'Other'].map(function (t) { return '<option' + (s.cType === t ? ' selected' : '') + '>' + t + '</option>'; }).join('');
-      return '<tr><td>' + (i + 1) + '</td>' +
-        '<td><input data-i="' + i + '" data-f="name" value="' + esc(s.name) + '"></td>' +
-        '<td><input type="time" data-i="' + i + '" data-f="arr" data-auto="1" value="' + esc(s.arr) + '"></td>' +
-        '<td><input type="time" data-i="' + i + '" data-f="dep" data-auto="1" value="' + esc(s.dep) + '"></td>' +
-        '<td><button type="button" class="btn alt sm" data-tog="' + i + '">Detention &#9662;</button></td>' +
+      function tm(f) { return '<div class="tcell"><input type="time" data-i="' + i + '" data-f="' + f + '" data-auto="1" value="' + esc(s[f]) + '"><button type="button" class="btn alt sm" data-fill="' + f + '">Auto fill</button></div>'; }
+      return '<tr class="str"><td>' + (i + 1) + '</td>' +
+        '<td data-l="Station Name"><input class="stname" data-i="' + i + '" data-f="name" value="' + esc(s.name) + '"></td>' +
+        '<td data-l="ARR">' + tm('arr') + '</td>' +
+        '<td data-l="DEP">' + tm('dep') + '</td>' +
         '<td><button type="button" class="btn red sm" data-del="' + i + '">&#10005;</button></td></tr>' +
-        '<tr class="det hidden" id="det' + i + '"><td></td><td colspan="5"><div class="grid">' +
+        '<tr class="stdb"><td></td><td colspan="4"><button type="button" class="btn alt sm" data-tog="' + i + '">Detention &#9662;</button></td></tr>' +
+        '<tr class="det hidden" id="det' + i + '"><td></td><td colspan="4"><div class="grid">' +
         fld(i, 'hArr', 'Home ARR') + fld(i, 'hDep', 'Home DEP') +
         '<div><label>Diff (Home ARR &rarr; DEP)</label><div class="diff" id="hd' + i + '">' + diffTxt(s.hArr, s.hDep) + '</div></div>' +
         spd(i, 'hLate', 'Home Late Off') + spd(i, 'sLate', 'Starter Late Off') +
-        '<div><label>CRO / MRO / Etc</label><select data-i="' + i + '" data-f="cType">' + o + '</select></div>' +
+        '<div style="grid-column:1/-1;max-width:220px"><label>CRO / MRO / Etc</label><select data-i="' + i + '" data-f="cType">' + o + '</select></div>' +
         fld(i, 't1', 'Time 1') + fld(i, 't2', 'Time 2') +
         '<div><label>Time 2 &minus; Time 1</label><div class="diff" id="cd' + i + '">' + diffTxt(s.t1, s.t2) + '</div></div>' +
         '</div></td></tr>';
@@ -556,7 +645,8 @@
   $('stBody').addEventListener('input', function (e) {
     var t = e.target, i = t.getAttribute('data-i');
     if (i === null) return;
-    st[+i][t.getAttribute('data-f')] = t.value; upd(+i); if (t.getAttribute('data-f') === 'name') updateRouteStationList();
+    st[+i][t.getAttribute('data-f')] = t.value; upd(+i);
+    if (t.getAttribute('data-f') === 'name') refreshStationSuggest();
   });
   $('stBody').addEventListener('change', function (e) {
     var t = e.target, i = t.getAttribute('data-i');
@@ -571,6 +661,11 @@
   });
   $('stBody').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
+    var fl = b.getAttribute('data-fill');
+    if (fl) {
+      var inp = b.parentNode.querySelector('input'), ix = +inp.getAttribute('data-i');
+      inp.value = nowHM(); st[ix][fl] = inp.value; upd(ix); return;
+    }
     var tg = b.getAttribute('data-tog'), dl = b.getAttribute('data-del');
     if (tg !== null) $('det' + tg).classList.toggle('hidden');
     if (dl !== null) { st.splice(+dl, 1); renderStations(); }
@@ -582,7 +677,7 @@
   var NUMA = 'inputmode="numeric" pattern="[0-9]*" data-num="1"';
 
   function endHtml(x) {
-    function tm(id) { return '<div class="tcell"><input type="time" id="' + id + '"><button type="button" class="btn alt sm" data-endnow="' + id + '">Now</button></div>'; }
+    function tm(id) { return '<div class="tcell"><input type="time" id="' + id + '"><button type="button" class="btn alt sm" data-endnow="' + id + '">Auto fill</button></div>'; }
     return '<div class="grid"><div><label>Select</label><select id="' + x + '_type">' +
         '<option value="">-- SELECT --</option><option value="sd">1) SHUTDOWN / SECURED</option><option value="ho">2) HANDOVER</option></select></div></div>' +
 
@@ -590,8 +685,8 @@
         '<div class="grid">' +
           '<div><label>Loco No.</label><input id="' + x + '_loco" ' + NUMA + '></div>' +
           '<div><label>Train No.</label><input id="' + x + '_train"></div>' +
-          '<div><label>Shutdown and secured on (Line No.)</label><input id="' + x + '_line" ' + NUMA + '></div>' +
-          '<div><label>At (time)</label>' + tm(x + '_time') + '</div>' +
+          '<div class="pair" style="grid-column:1/-1"><div><label>Shutdown and secured on (Line No.)</label><input id="' + x + '_line" ' + NUMA + '></div>' +
+          '<div><label>At (time)</label>' + tm(x + '_time') + '</div></div>' +
         '</div>' +
         '<div class="actions" style="margin:14px 0 8px"><b>Checklist</b>' +
           '<button type="button" class="btn alt sm" data-endall="' + x + '">Auto fill (tick all)</button>' +
@@ -603,6 +698,11 @@
         '<p class="hint" style="margin:14px 0 6px">All keys submitted:</p>' +
         '<div class="grid">' + KEYS.map(function (c) { return '<label class="chk"><input type="checkbox" checked id="' + x + '_k_' + c[0] + '"> ' + c[1] + '</label>'; }).join('') + '</div>' +
         '<div class="grid" style="margin-top:12px"><div><label>Keys submitted to (On Duty name)</label><input id="' + x + '_duty" list="staffList" autocomplete="off"></div></div>' +
+        '<div style="margin-top:14px"><b>Shutdown / Secured photo</b><div class="actions" style="margin:8px 0 0">' +
+          '<button type="button" class="btn sm" data-cam="' + x + '">&#128247; Capture photo</button>' +
+          '<label class="btn alt sm photoBtn" for="' + x + '_photo" style="color:var(--brand);margin:0">Add from gallery</label>' +
+          '<input type="file" id="' + x + '_photo" accept="image/*" multiple></div>' +
+          '<div class="thumbs" id="' + x + '_prev"></div></div>' +
       '</div>' +
 
       '<div id="' + x + '_ho" class="group hidden" style="margin-top:12px"><h3>Handover</h3>' +
@@ -617,14 +717,22 @@
       '</div>' +
       '<p id="' + x + '_stmt" class="hidden" style="margin:12px 0 0;padding:10px 12px;background:#eef3ff;border-left:4px solid var(--brand);border-radius:6px;font-size:.95rem"></p>';
   }
+  var SYNC = {};
+  ['te', 'se'].forEach(function (x) {
+    var pre = x === 'te' ? 't_' : 's_';
+    SYNC[x] = [[x + '_loco', pre + 'loco'], [x + '_hloco', pre + 'loco'], [x + '_train', pre + 'train'], [x + '_htrain', pre + 'train']];
+  });
+  /* Loco No. / Train in Shutdown-Secured and Handover follow the Loco / Train typed above, until the user types in them */
+  function syncEnd(x) {
+    SYNC[x].forEach(function (m) { var el = $(m[0]), v = $(m[1]).value; if (el.dataset.man !== '1' && v) el.value = v; });
+  }
   ['te', 'se'].forEach(function (x) {
     $(x + '_box').innerHTML = endHtml(x);
-    $(x + '_type').addEventListener('change', function () {
-      endShow(x);
-      var pre = x === 'te' ? 't_' : 's_';        // fill loco / train from the form above when empty
-      [[x + '_loco', pre + 'loco'], [x + '_hloco', pre + 'loco'], [x + '_train', pre + 'train'], [x + '_htrain', pre + 'train']].forEach(function (m) {
-        if (!$(m[0]).value && $(m[1]).value) $(m[0]).value = $(m[1]).value;
-      });
+    $(x + '_type').addEventListener('change', function () { endShow(x); syncEnd(x); });
+    $(x + '_photo').addEventListener('change', function () { addPhotos(this, endPh[x], x + '_prev'); });
+    SYNC[x].forEach(function (m) {
+      $(m[0]).addEventListener('input', function (e) { if (e.isTrusted) { if (this.value) this.dataset.man = '1'; else delete this.dataset.man; } });
+      $(m[1]).addEventListener('input', function () { syncEnd(x); });
     });
   });
   function endShow(x) {
@@ -635,14 +743,16 @@
   function endGet(x) {
     var o = { type: $(x + '_type').value, loco: $(x + '_loco').value, train: $(x + '_train').value, line: $(x + '_line').value, time: $(x + '_time').value,
       duty: $(x + '_duty').value, hloco: $(x + '_hloco').value, htrain: $(x + '_htrain').value, hlp: $(x + '_hlp').value, hid: $(x + '_hid').value,
-      htime: $(x + '_htime').value, checks: {}, keys: {} };
+      htime: $(x + '_htime').value, checks: {}, keys: {}, photos: endPh[x].slice() };
     o.ww = $(x + '_wwn').value;
     EK.forEach(function (c) { o.checks[c[0]] = c[0] === 'ww4' ? !!o.ww : $(x + '_c_' + c[0]).checked; });
     KEYS.forEach(function (c) { o.keys[c[0]] = $(x + '_k_' + c[0]).checked; });
     return o;
   }
   function endSet(x, o) {
+    (SYNC[x] || []).forEach(function (m) { delete $(m[0]).dataset.man; });
     o = o || {};
+    endPh[x] = (o.photos || []).slice(); renderPrev(endPh[x], x + '_prev');
     $(x + '_type').value = o.type || '';
     ['loco', 'train', 'line', 'time', 'duty', 'hloco', 'htrain', 'hlp', 'hid', 'htime'].forEach(function (f) { $(x + '_' + f).value = (f === 'hid' ? (o.hid || o.hhq) : o[f]) || ''; });
     $(x + '_wwn').value = o.ww || ((o.checks && o.checks.ww4) ? '4' : '');
@@ -668,15 +778,17 @@
     }
     var ck = e.checks || {}, ky = e.keys || {};
     var ww = e.ww || (ck.ww4 ? '4' : '');
-    var isOk = function (c) { return c[0] === 'ww4' ? !!ww : !!ck[c[0]]; };
-    var lab = function (c) { return c[0] === 'ww4' && ww ? ww + ' WW APPLIED' : c[1]; };
-    var done = EK.filter(isOk).map(lab);
-    var notDone = EK.filter(function (c) { return !isOk(c); }).map(lab);
+    var APPL = { sa9: 'SA9 APPLIED', hbpb: 'HB/PB APPLIED' };
+    var lab = function (c) { return APPL[c[0]] || c[1]; };
+    var rest = EK.filter(function (c) { return c[0] !== 'ww4'; });
+    var done = rest.filter(function (c) { return !!ck[c[0]]; }).map(lab);
+    var notDone = rest.filter(function (c) { return !ck[c[0]]; }).map(lab);
+    var wwTxt = ww ? ww + ' WW APPLIED' : '-WW APPLIED';
     var gave = KEYS.filter(function (c) { return ky[c[0]]; }).map(function (c) { return c[1]; });
     var miss = KEYS.filter(function (c) { return !ky[c[0]]; }).map(function (c) { return c[1]; });
     var t = 'Loco No. ' + (e.loco || '-') + ', Train No. ' + (e.train || '-') + ' shutdown and secured on Line No. ' + (e.line || '-') + ' at ' + (e.time || '-') + '.';
-    if (done.length) t += ' ' + done.join(', ') + (done.length === EK.length ? '.' : ' done.');
-    if (notDone.length && done.length) t += ' Not done: ' + notDone.join(', ') + '.';
+    if (done.length || ww) t += ' ' + done.concat([wwTxt]).join(', ') + '.';
+    if (notDone.length && (done.length || ww)) t += ' Not done: ' + notDone.join(', ') + '.';
     if (gave.length === KEYS.length) t += ' All keys (' + gave.join(', ') + ') submitted to on duty ' + (e.duty || '-') + '.';
     else if (gave.length) t += ' Keys submitted to on duty ' + (e.duty || '-') + ': ' + gave.join(', ') + '. Not submitted: ' + miss.join(', ') + '.';
     else if (e.duty) t += ' Keys not yet submitted (on duty ' + e.duty + ').';
@@ -695,14 +807,76 @@
 
   /* ---------- train movement: save / list / export ---------- */
   var TF = ['date', 'signon', 'loco', 'shed', 'sdone', 'sdoneK', 'sdue', 'sdueK', 'cto', 'line', 'train', 'bpc', 'fto', 'fho',
-    'formno', 't8start', 't8end', 'bftinit', 'bftfinal', 'bfttime', 'bptinit', 'bptfinal', 'bpttime'];
+    'formno', 't8start', 't8end', 'bftI', 'bftF', 'bftT', 'bptI', 'bptF', 'bptT'];
+  var editT = null, editS = null, editRouteKeep = '';
+  function authText(r) {
+    var a = [(r.authority || '') + (r.formno ? ' (No. ' + r.formno + ')' : '')].concat((r.xa || []).map(function (x) { return (x.name || '') + (x.no ? ' (No. ' + x.no + ')' : ''); }));
+    return a.filter(function (v) { return v.trim(); }).join(', ');
+  }
+  function hasT806(r) { return r.authority === 'T806' || (r.xa || []).some(function (x) { return x.name === 'T806'; }); }
+  function formT806() { return $('t_auth').value === 'T806' || xa.some(function (x) { return x.a === 'T806'; }); }
+  function updT806() { $('t806Box').classList.toggle('hidden', !formT806()); }
+  function renderXA() {
+    $('moreAuth').innerHTML = xa.map(function (x, i) {
+      var o = ['T409', 'T806', 'Other'].map(function (t) { return '<option' + (x.a === t ? ' selected' : '') + '>' + t + '</option>'; }).join('');
+      return '<div class="group" style="margin-top:8px"><div class="grid"><div><label>Authority ' + (i + 2) + '</label><select data-xa="' + i + '" data-f="a">' + o + '</select></div>' +
+        '<div><label>No.</label><input inputmode="numeric" data-xa="' + i + '" data-f="no" value="' + esc(x.no) + '"></div>' +
+        (x.a === 'Other' ? '<div><label>Authority (other)</label><input data-xa="' + i + '" data-f="o" value="' + esc(x.o) + '"></div>' : '') +
+        '<div style="align-self:end"><button type="button" class="btn red sm" data-xadel="' + i + '">Remove</button></div></div></div>';
+    }).join('');
+    updT806();
+  }
+  $('addAuth').addEventListener('click', function () { xa.push({ a: 'T409', o: '', no: '' }); renderXA(); queueSave(); });
+  $('moreAuth').addEventListener('input', function (e) {
+    var t = e.target, i = t.getAttribute('data-xa'); if (i === null) return;
+    xa[+i][t.getAttribute('data-f')] = t.value; queueSave();
+  });
+  $('moreAuth').addEventListener('change', function (e) {
+    var t = e.target; if (t.getAttribute('data-f') === 'a') { renderXA(); queueSave(); }
+  });
+  $('moreAuth').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-xadel]'); if (b) { xa.splice(+b.getAttribute('data-xadel'), 1); renderXA(); queueSave(); }
+  });
+  function setEditT(id) {
+    editT = id || null; if (!id) editRouteKeep = '';
+    $('trainEditBar').classList.toggle('hidden', !editT);
+    $('saveTrain').textContent = editT ? 'Update Train Movement' : 'Save Train Movement';
+    $('resetTrain').textContent = editT ? 'Cancel edit' : 'Reset form';
+  }
+  function setEditS(id) {
+    editS = id || null;
+    $('shuntEditBar').classList.toggle('hidden', !editS);
+    $('saveShunt').textContent = editS ? 'Update Shunting Movement' : 'Save Shunting Movement';
+    $('resetShunt').textContent = editS ? 'Cancel edit' : 'Reset form';
+  }
+  function loadTrain(i) {
+    var r = trains[i]; if (!r) return;
+    TF.forEach(function (f) { $('t_' + f).value = fd(r[f]); });
+    P.forEach(function (p) { ['name', 'cug', 'id'].forEach(function (k) { $(p[0] + '_' + k).value = r[p[0] + '_' + k] || ''; }); });
+    var a = r.authority || 'T409';
+    if (a === 'T409' || a === 'T806') { $('t_auth').value = a; $('t_authOther').value = ''; }
+    else { $('t_auth').value = 'Other'; $('t_authOther').value = a === 'Other' ? '' : a; }
+    $('authOtherBox').classList.toggle('hidden', $('t_auth').value !== 'Other');
+    xa = (r.xa || []).map(function (x) { var k = ['T409', 'T806'].indexOf(x.name) > -1; return { a: k ? x.name : 'Other', o: k ? '' : (x.name === 'Other' ? '' : x.name), no: x.no || '' }; });
+    renderXA();
+    refreshRouteSelect();
+    var ri = -1; routes.forEach(function (x, k) { if (x.name === r.route) ri = k; });
+    $('t_route').value = ri >= 0 ? String(ri) : '';
+    editRouteKeep = (ri < 0 && r.route) ? r.route : '';
+    st = JSON.parse(JSON.stringify(r.stations || [])); renderStations();
+    blocks = (r.blocks && r.blocks.length) ? JSON.parse(JSON.stringify(r.blocks)) : [blankBlk('Block Back'), blankBlk('Block Forward')]; renderBlk();
+    t8Diff(); calcCons();
+    endSet('te', r.end);
+    setEditT(r.id); setMsg('trainMsg', '');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   function resetTrain() {
     TF.forEach(function (f) { $('t_' + f).value = ''; });
     P.forEach(function (p) { ['name', 'cug', 'id'].forEach(function (k) { $(p[0] + '_' + k).value = ''; }); });
     $('t_auth').value = 'T409'; $('t_authOther').value = ''; $('authOtherBox').classList.add('hidden');
-    $('t806Box').classList.add('hidden'); $('t8diff').textContent = ''; resetBlocks();
+    xa = []; renderXA(); $('t806Box').classList.add('hidden'); $('t8diff').textContent = ''; resetBlocks();
     $('t_route').value = ''; $('t_cons').value = ''; 
-    $('t_date').value = today(); st = []; renderStations(); endReset('te');
+    $('t_date').value = today(); st = []; renderStations(); endReset('te'); setEditT(null);
   }
   $('resetTrain').addEventListener('click', function () { resetTrain(); setMsg('trainMsg', ''); });
   $('saveTrain').addEventListener('click', function () {
@@ -710,30 +884,33 @@
       setMsg('trainMsg', 'Enter at least the LP name and a Train or Loco number.', 'err'); return;
     }
     var rec = { id: Date.now(), authority: $('t_auth').value === 'Other' ? ($('t_authOther').value || 'Other') : $('t_auth').value,
-      route: $('t_route').value === '' ? '' : routes[+$('t_route').value].name, cons: $('t_cons').value,
+      route: $('t_route').value === '' ? editRouteKeep : routes[+$('t_route').value].name, cons: $('t_cons').value,
       stations: JSON.parse(JSON.stringify(st)) };
     TF.forEach(function (f) { rec[f] = $('t_' + f).value; });
-    if (rec.authority !== 'T806') { rec.t8start = ''; rec.t8end = ''; }
-    rec.blocks = rec.authority === 'T806'
+    rec.xa = xa.filter(function (x) { return x.no || x.a !== 'Other' || x.o; }).map(function (x) { return { name: x.a === 'Other' ? (x.o || 'Other') : x.a, no: x.no }; });
+    if (!hasT806(rec)) { rec.t8start = ''; rec.t8end = ''; }
+    rec.blocks = hasT806(rec)
       ? blocks.filter(function (b) { return b.st || b.no; }).map(function (b) { return { type: b.type, st: b.st, no: b.no }; }) : [];
     rec.t8diff = diffTxt(rec.t8start, rec.t8end);
     P.forEach(function (p) { ['name', 'cug', 'id'].forEach(function (k) { rec[p[0] + '_' + k] = $(p[0] + '_' + k).value; }); });
     rec.end = endGet('te');
-    trains.unshift(rec); store('trains', trains);
-    renderTrainList(); resetTrain(); setMsg('trainMsg', 'Train movement saved.', 'ok');
+    var ei = editT ? trains.findIndex(function (x) { return x.id === editT; }) : -1;
+    if (ei >= 0) { rec.id = editT; trains[ei] = rec; } else trains.unshift(rec);
+    store('trains', trains);
+    renderTrainList(); resetTrain(); setMsg('trainMsg', ei >= 0 ? 'Train movement updated.' : 'Train movement saved.', 'ok');
   });
   function renderTrainList() {
     $('trainList').innerHTML = trains.map(function (r, i) {
-      return '<tr><td>' + esc(r.date) + '</td><td>' + esc(r.train) + '</td><td>' + esc(r.loco) + '</td><td>' + esc(r.lp_name) +
-        '</td><td>' + esc(r.authority) + (r.formno ? ' (Form ' + esc(r.formno) + ')' : '') +
-        '</td><td>' + esc(r.route) + '</td><td>' + r.stations.length + '</td><td>' + esc(r.cons) +
-        '</td><td style="min-width:260px">' + esc(endStatement(r.end)) +
-        '</td><td style="white-space:nowrap"><button class="btn alt sm" data-vt="' + i + '">View</button> <button class="btn sm" data-sht="' + i + '">Share (WhatsApp)</button> <button class="btn red sm" data-dt="' + i + '">Delete</button></td></tr>';
+      return '<tr class="sv"><td data-l="Date">' + esc(r.date) + '</td><td data-l="Train">' + esc(r.train) + '</td><td data-l="Loco">' + esc(r.loco) + '</td><td data-l="LP">' + esc(r.lp_name) +
+        '</td><td data-l="Authority">' + esc(authText(r)) +
+        '</td><td data-l="Route">' + esc(r.route) + '</td><td data-l="Stations">' + (r.stations || []).length + '</td><td data-l="Consumption">' + esc(r.cons) +
+        '</td><td data-l="End of duty" style="min-width:260px">' + esc(endStatement(r.end)) +
+        '</td><td class="svact"><button class="btn sm" data-sht="' + i + '">Share (WhatsApp)</button><button class="btn alt sm" data-ed="' + i + '">Edit</button><button class="btn red sm" data-dt="' + i + '">Delete</button></td></tr>';
     }).join('') || '<tr><td colspan="10" class="hint">No records yet.</td></tr>';
   }
   $('trainList').addEventListener('click', function (e) {
-    var vw = e.target.closest('[data-vt]'); if (vw) { openView('train', +vw.getAttribute('data-vt')); return; }
     var sh = e.target.closest('[data-sht]'); if (sh) { shareRecord('train', +sh.getAttribute('data-sht')); return; }
+    var ed = e.target.closest('[data-ed]'); if (ed) { loadTrain(+ed.getAttribute('data-ed')); return; }
     var b = e.target.closest('[data-dt]'); if (!b) return;
     if (confirm('Delete this record?')) { trains.splice(+b.getAttribute('data-dt'), 1); store('trains', trains); renderTrainList(); }
   });
@@ -746,7 +923,7 @@
     var h = new Date().getHours();
     return (h >= 7 && h < 15) ? '7-15' : (h >= 15 && h < 23) ? '15-23' : '23-7';
   }
-  function blankMv() { return { l1: '', arr: '', l2: '', dep: '', rmk: '' }; }
+  function blankMv() { return { l1: '', arr: '', l2: '', dep: '', remark: '' }; }
 
   function initShunt() {
     $('s_date').value = today();
@@ -791,13 +968,13 @@
   /* movement table */
   function renderMv() {
     $('mvBody').innerHTML = mv.map(function (m, i) {
-      return '<tr><td>' + (i + 1) + '</td>' +
-        '<td><input data-i="' + i + '" data-f="l1" value="' + esc(m.l1) + '"></td>' +
-        '<td><div class="tcell"><input type="time" data-i="' + i + '" data-f="arr" value="' + esc(m.arr) + '"><button type="button" class="btn alt sm" data-now="arr" data-i="' + i + '">Now</button></div></td>' +
-        '<td><input data-i="' + i + '" data-f="l2" value="' + esc(m.l2) + '"></td>' +
-        '<td><div class="tcell"><input type="time" data-i="' + i + '" data-f="dep" value="' + esc(m.dep) + '"><button type="button" class="btn alt sm" data-now="dep" data-i="' + i + '">Now</button></div></td>' +
-        '<td><input data-i="' + i + '" data-f="rmk" value="' + esc(m.rmk) + '" style="min-width:140px"></td>' +
-        '<td>' + (mv.length > 1 ? '<button type="button" class="btn red sm" data-md="' + i + '" title="Remove this row">&#10005;</button>' : '') + '</td></tr>';
+      return '<tr class="mvr"><td>' + (i + 1) + '</td>' +
+        '<td data-l="Line / SH"><input data-i="' + i + '" data-f="l1" value="' + esc(m.l1) + '"></td>' +
+        '<td data-l="ARR"><div class="tcell"><input type="time" data-i="' + i + '" data-f="arr" value="' + esc(m.arr) + '"><button type="button" class="btn alt sm" data-now="arr" data-i="' + i + '">Auto fill</button></div></td>' +
+        '<td data-l="Line / SH"><input data-i="' + i + '" data-f="l2" value="' + esc(m.l2) + '"></td>' +
+        '<td data-l="DEP"><div class="tcell"><input type="time" data-i="' + i + '" data-f="dep" value="' + esc(m.dep) + '"><button type="button" class="btn alt sm" data-now="dep" data-i="' + i + '">Auto fill</button></div></td>' +
+        '<td>' + (mv.length > 1 ? '<button type="button" class="btn red sm" data-md="' + i + '" title="Remove this row">&#10005;</button>' : '') + '</td></tr>' +
+        '<tr class="mvrem"><td></td><td colspan="5"><label>Remark</label><input data-i="' + i + '" data-f="remark" value="' + esc(m.remark || '') + '"></td></tr>';
     }).join('');
   }
   $('addMv').addEventListener('click', function () { mv.push(blankMv()); renderMv(); });
@@ -860,34 +1037,58 @@
         $('camTxt').textContent = 'Live camera – tap Capture. You can take several photos.';
       });
   }
-  function camFallback(input) {
-    $('camBox').classList.remove('on'); camStop();
-    setMsg('shuntMsg', 'Live camera is not available here, so the phone camera app was opened instead.', 'err');
-    input.click();
+  var camMode = 'live';
+  function camArr() { return camFor === 'm' ? mPhotos : endPh[camFor]; }
+  function camPrev() { return camFor === 'm' ? 'mPrev' : camFor + '_prev'; }
+  function camRefresh() {
+    $('camThumbs').innerHTML = camArr().slice(-10).map(function (d) { return '<div class="thumb"><img src="' + d + '" alt="photo"></div>'; }).join('');
+  }
+  function camShow(live) {
+    camMode = live ? 'live' : 'app';
+    $('camVideo').style.display = live ? '' : 'none'; $('camFlip').style.display = live ? '' : 'none';
+    $('camShot').innerHTML = live ? '&#128247; Capture' : '&#128247; Take photo';
+  }
+  function camFallback() {
+    camStop(); camShow(false); $('camBox').classList.add('on');
+    $('camTxt').textContent = 'Tap "Take photo" to open the phone camera. After each photo tap it again for the next one. Tap Done when finished.';
+    camRefresh();
+  }
+  $('camApp').addEventListener('change', function () {
+    var f = this.files && this.files[0]; this.value = ''; if (!f) return;
+    compress(f, function (d) {
+      if (!d) return;
+      camArr().push(d); camCount++; renderPrev(camArr(), camPrev()); camRefresh(); queueSave();
+      $('camTxt').textContent = camCount + ' photo(s) captured. Tap "Take photo" for more or Done to finish.';
+    });
+  });
+  function openCam(x) {
+    camFor = x; camCount = 0; camShow(true); camRefresh();
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { camFallback(); return; }
+    $('camBox').classList.add('on');
+    camStart().catch(function () { camFallback(); });
   }
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-cam]'); if (!b) return;
-    camFor = b.getAttribute('data-cam'); camCount = 0;
-    var input = $('s_mphoto');
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { camFallback(input); return; }
-    $('camBox').classList.add('on');
-    camStart().catch(function () { camFallback(input); });
+    openCam(b.getAttribute('data-cam'));
   });
+
   $('camFlip').addEventListener('click', function () {
     camFacing = camFacing === 'environment' ? 'user' : 'environment';
     camStart().catch(function () { $('camTxt').textContent = 'Could not switch camera.'; });
   });
   $('camShot').addEventListener('click', function () {
+    if (camMode === 'app') { $('camApp').click(); return; }
     var v = $('camVideo');
     if (!camStream || !v.videoWidth) { $('camTxt').textContent = 'Camera is not ready yet.'; return; }
     var k = Math.min(1, 800 / Math.max(v.videoWidth, v.videoHeight));
     var c = document.createElement('canvas');
     c.width = Math.round(v.videoWidth * k); c.height = Math.round(v.videoHeight * k);
     c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
-    var arr = mPhotos;
+    var arr = camArr();
     arr.push(c.toDataURL('image/jpeg', 0.6)); camCount++;
-    renderPrev(arr, 'mPrev'); queueSave();
-    $('camTxt').textContent = camCount + ' photo(s) captured. Capture more or tap Done.';
+    renderPrev(arr, camPrev()); camRefresh(); queueSave();
+    var bx = $('camBox'); bx.classList.add('flash'); setTimeout(function () { bx.classList.remove('flash'); }, 150);
+    $('camTxt').textContent = camCount + ' photo(s) captured. Keep tapping Capture for more, then tap Done.';
   });
   function camClose() { $('camBox').classList.remove('on'); camStop(); }
   $('camClose').addEventListener('click', camClose);
@@ -896,40 +1097,53 @@
   $('s_mphoto').addEventListener('change', function () { addPhotos(this, mPhotos, 'mPrev'); });
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-ph]'); if (!b) return;
-    var id = b.getAttribute('data-ph'), arr = mPhotos;
+    var id = b.getAttribute('data-ph'), arr = id === 'mPrev' ? mPhotos : endPh[id.slice(0, 2)];
     arr.splice(+b.getAttribute('data-i'), 1); renderPrev(arr, id);
   });
 
   /* save / reset */
+  function loadShunt(i) {
+    var r = shunts[i]; if (!r) return;
+    SFLD.forEach(function (f) { $('s_' + f).value = fd(r[f]); });
+    mv = (r.mv || []).map(function (m) { return { l1: m.l1 || '', arr: m.arr || '', l2: m.l2 || '', dep: m.dep || '', remark: m.remark || '' }; });
+    if (!mv.length) mv = [blankMv()];
+    extra = normSets(r.extra);
+    mPhotos.length = 0; (r.mPhotos || []).forEach(function (x) { mPhotos.push(x); });
+    endSet('se', r.end);
+    renderMv(); renderExtra(); renderPrev(mPhotos, 'mPrev');
+    setEditS(r.id); setMsg('shuntMsg', '');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   function resetShunt() {
     SFLD.forEach(function (f) { $('s_' + f).value = ''; });
     mv = [blankMv()]; extra = []; mPhotos.length = 0; endReset('se');
     renderMv(); renderExtra(); renderPrev(mPhotos, 'mPrev');
-    $('s_date').value = today(); $('s_shift').value = autoShift();
+    $('s_date').value = today(); $('s_shift').value = autoShift(); setEditS(null);
   }
   $('resetShunt').addEventListener('click', function () { resetShunt(); setMsg('shuntMsg', ''); });
   $('saveShunt').addEventListener('click', function () {
     if (!$('s_loco').value.trim() && !$('s_train').value.trim()) { setMsg('shuntMsg', 'Enter a Train or Loco number.', 'err'); return; }
     var rec = { id: Date.now(), extra: extra.filter(function (x) { return x.master || x.pm1 || x.pm2; }).map(function (x) { return { master: x.master, pm1: x.pm1, pm2: x.pm2 }; }), end: endGet('se'),
-      mv: mv.filter(function (m) { return m.l1 || m.arr || m.l2 || m.dep || m.rmk; }).map(function (m) { return { l1: m.l1, arr: m.arr, l2: m.l2, dep: m.dep, rmk: m.rmk || '' }; }),
+      mv: mv.filter(function (m) { return m.l1 || m.arr || m.l2 || m.dep || m.remark; }).map(function (m) { return { l1: m.l1, arr: m.arr, l2: m.l2, dep: m.dep, remark: m.remark || '' }; }),
       mPhotos: mPhotos.slice() };
     SFLD.forEach(function (f) { rec[f] = $('s_' + f).value; });
-    shunts.unshift(rec);
+    var ei = editS ? shunts.findIndex(function (x) { return x.id === editS; }) : -1, oldRec = null;
+    if (ei >= 0) { rec.id = editS; oldRec = shunts[ei]; shunts[ei] = rec; } else shunts.unshift(rec);
     if (!store('shunts2', shunts)) {
-      shunts.shift();
+      if (ei >= 0) shunts[ei] = oldRec; else shunts.shift();
       setMsg('shuntMsg', 'Could not save: browser storage is full. Remove some photos or delete older records and try again.', 'err');
       return;
     }
-    renderShuntList(); resetShunt(); setMsg('shuntMsg', 'Shunting movement saved.', 'ok');
+    renderShuntList(); resetShunt(); setMsg('shuntMsg', ei >= 0 ? 'Shunting movement updated.' : 'Shunting movement saved.', 'ok');
   });
 
   /* saved list */
   function shDet(r) {
     var staffTxt = [r.master && ('Master: ' + r.master), r.pm1 && ('Pointsman 1: ' + r.pm1), r.pm2 && ('Pointsman 2: ' + r.pm2)]
       .concat(setsTxt(r)).filter(Boolean).join(' | ');
-    var endH = '<p><b>SHUTDOWN / SECURED OR HANDOVER:</b> ' + (endStatement(r.end) ? esc(endStatement(r.end)) : '-') + '</p>';
+    var endH = '<p><b>SHUTDOWN / SECURED OR HANDOVER:</b> ' + (endStatement(r.end) ? esc(endStatement(r.end)) : '-') + '</p>' + (r.end && r.end.photos && r.end.photos.length ? '<p><b>Shutdown / Secured photos:</b></p>' + imgs(r.end.photos) : '');
     var mvt = r.mv.length ? '<table><thead><tr><th>Line/SH</th><th>ARR</th><th>Line/SH</th><th>DEP</th><th>Remark</th></tr></thead><tbody>' +
-      r.mv.map(function (m) { return '<tr><td>' + esc(m.l1) + '</td><td>' + esc(m.arr) + '</td><td>' + esc(m.l2) + '</td><td>' + esc(m.dep) + '</td><td>' + esc(m.rmk) + '</td></tr>'; }).join('') +
+      r.mv.map(function (m) { return '<tr><td>' + esc(m.l1) + '</td><td>' + esc(m.arr) + '</td><td>' + esc(m.l2) + '</td><td>' + esc(m.dep) + '</td><td>' + esc(m.remark || '') + '</td></tr>'; }).join('') +
       '</tbody></table>' : '<span class="hint">No movements recorded.</span>';
     function imgs(a) { return a.length ? '<div class="thumbs">' + a.map(function (d) { return '<div class="thumb"><img src="' + d + '" alt="photo"></div>'; }).join('') + '</div>' : '<span class="hint">None</span>'; }
     return '<div style="white-space:normal"><p><b>Sign on:</b> ' + esc(r.signon) + ' &nbsp; <b>Staff:</b> ' + esc(staffTxt) + '</p>' +
@@ -939,14 +1153,17 @@
   }
   function renderShuntList() {
     $('shuntList').innerHTML = shunts.map(function (r, i) {
-      return '<tr><td>' + esc(r.date) + '</td><td>' + esc(r.shift) + '</td><td>' + esc(r.train) + '</td><td>' + esc(r.loco) + '</td><td>' + esc(r.master) +
-        '</td><td>' + r.mv.length + '</td><td style="min-width:260px">' + esc(endStatement(r.end)) +
-        '</td><td><button class="btn alt sm" data-vs="' + i + '">View</button> <button class="btn sm" data-shs="' + i + '">Share (WhatsApp)</button> <button class="btn red sm" data-ds="' + i + '">Delete</button></td></tr>';
+      return '<tr class="sv"><td data-l="Date">' + esc(r.date) + '</td><td data-l="Shift">' + esc(r.shift) + '</td><td data-l="Train">' + esc(r.train) + '</td><td data-l="Loco">' + esc(r.loco) + '</td><td data-l="Shunting Master">' + esc(r.master) +
+        '</td><td data-l="Movements">' + r.mv.length + '</td><td data-l="End of duty" style="min-width:260px">' + esc(endStatement(r.end)) +
+        '</td><td class="svact"><button class="btn sm" data-shs="' + i + '">Share (WhatsApp)</button><button class="btn alt sm" data-es="' + i + '">Edit</button><button class="btn alt sm" data-dd="' + i + '">Details</button><button class="btn red sm" data-ds="' + i + '">Delete</button></td></tr>' +
+        '<tr class="det hidden" id="sdet' + i + '"><td colspan="8">' + shDet(r) + '</td></tr>';
     }).join('') || '<tr><td colspan="8" class="hint">No records yet.</td></tr>';
   }
   $('shuntList').addEventListener('click', function (e) {
     var sh = e.target.closest('[data-shs]'); if (sh) { shareRecord('shunt', +sh.getAttribute('data-shs')); return; }
-    var vw = e.target.closest('[data-vs]'); if (vw) { openView('shunt', +vw.getAttribute('data-vs')); return; }
+    var es = e.target.closest('[data-es]'); if (es) { loadShunt(+es.getAttribute('data-es')); return; }
+    var d = e.target.closest('[data-dd]');
+    if (d) { $('sdet' + d.getAttribute('data-dd')).classList.toggle('hidden'); return; }
     var b = e.target.closest('[data-ds]'); if (!b) return;
     if (confirm('Delete this record?')) { shunts.splice(+b.getAttribute('data-ds'), 1); store('shunts2', shunts); renderShuntList(); }
   });
@@ -987,8 +1204,15 @@
         res = parseSheet(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, defval: '' }));
       } catch (e) { setMsg('crewMsg', 'Could not read this Excel file. Please upload a valid .xlsx or .xls file.', 'err'); return; }
       if (!res.rows.length) { setMsg('crewMsg', 'No valid records found. Each row needs 3 columns: NAME, CUG, ID.', 'err'); return; }
-      crew[cat] = res.rows; store('crew3', crew); refreshLists(); renderCrew();
-      setMsg('crewMsg', res.rows.length + ' ' + CN[cat] + ' record(s) loaded' + (res.skipped ? '; ' + res.skipped + ' row(s) skipped (missing values).' : '.'), 'ok');
+      var added = 0, updated = 0, key = function (r) { return String(r.id || '').trim().toUpperCase() || (r.name + '|' + r.cug); };
+      var idx = {}; crew[cat].forEach(function (r, k) { idx[key(r)] = k; });
+      res.rows.forEach(function (r) {
+        var k = key(r);
+        if (idx[k] !== undefined) { crew[cat][idx[k]] = r; updated++; }
+        else { idx[k] = crew[cat].push(r) - 1; added++; }
+      });
+      store('crew3', crew); refreshLists(); renderCrew();
+      setMsg('crewMsg', added + ' new ' + CN[cat] + ' record(s) added to the existing list' + (updated ? '; ' + updated + ' existing record(s) (same ID) updated' : '') + (res.skipped ? '; ' + res.skipped + ' row(s) skipped (missing values)' : '') + '. Previous details are kept. Total: ' + crew[cat].length + '.', 'ok');
     };
     rd.onerror = function () { setMsg('crewMsg', 'Could not read the file.', 'err'); };
     rd.readAsArrayBuffer(file);
@@ -1068,6 +1292,15 @@
     }
   }, true);
 
+  /* "Auto fill" button next to a time box: fills the current time */
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-nowfill]'); if (!b) return;
+    var el = $(b.getAttribute('data-nowfill')); if (!el) return;
+    el.value = nowHM();
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+
   /* every time box fills the current time when it is empty and clicked / focused */
   document.addEventListener('focusin', function (e) {
     var t = e.target;
@@ -1079,26 +1312,35 @@
   });
 
   /* ---------- share as PDF (WhatsApp) ---------- */
-  function KM(v) { return (v == null || v === '') ? '-' : v + ' km/h'; }
-  function bi(r) { return r.bftinit || r.bftspd || ''; }
   function S(v) { return (v == null || v === '') ? '-' : String(v); }
-  function newDoc(title, orient) {
+  function K(v) { return (v == null || v === '') ? '-' : String(v) + ' KMPH'; }
+  function newDoc(title, orient, sub) {
     var J = window.jspdf.jsPDF;
-    var doc = new J({ orientation: orient, unit: 'mm', format: 'a4' });
-    doc.setFontSize(15); doc.setTextColor(29, 78, 216); doc.text(title, 10, 12);
-    doc.setFontSize(8); doc.setTextColor(100); doc.text('Generated ' + new Date().toLocaleString(), 10, 17);
-    doc.setTextColor(0); doc._y = 21;
+    var doc = new J({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    var pw = doc.internal.pageSize.getWidth();
+    doc.setFillColor(29, 78, 216); doc.rect(0, 0, pw, 25, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(17); doc.text(title, 10, 11);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
+    doc.text(sub || '', 10, 17); doc.text('Generated ' + new Date().toLocaleString(), 10, 21.5);
+    doc.setTextColor(0, 0, 0); doc._y = 31;
     return doc;
   }
   function secTitle(doc, t) {
-    if (doc._y > doc.internal.pageSize.getHeight() - 25) { doc.addPage(); doc._y = 12; }
-    doc.setFontSize(10); doc.setTextColor(29, 78, 216); doc.text(t, 10, doc._y + 4); doc.setTextColor(0); doc._y += 6;
+    var pw = doc.internal.pageSize.getWidth();
+    if (doc._y > doc.internal.pageSize.getHeight() - 32) { doc.addPage(); doc._y = 14; }
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.setTextColor(29, 78, 216);
+    doc.text(String(t).toUpperCase(), 10, doc._y + 4);
+    doc.setDrawColor(29, 78, 216); doc.setLineWidth(0.4); doc.line(10, doc._y + 6, pw - 10, doc._y + 6);
+    doc.setTextColor(0, 0, 0); doc.setFont('helvetica', 'normal'); doc._y += 9;
   }
   function tbl(doc, title, head, body, opts) {
     secTitle(doc, title);
     doc.autoTable(Object.assign({ startY: doc._y, head: head ? [head] : undefined, body: body, theme: 'grid',
-      styles: { fontSize: 8, cellPadding: 1.5 }, headStyles: { fillColor: [29, 78, 216], textColor: 255 }, margin: { left: 10, right: 10 } }, opts || {}));
-    doc._y = doc.lastAutoTable.finalY + 4;
+      styles: { fontSize: 8.5, cellPadding: 1.8, lineColor: [200, 208, 224], lineWidth: 0.1, textColor: [20, 20, 20] },
+      headStyles: { fillColor: [29, 78, 216], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: head ? { fillColor: [247, 249, 253] } : {},
+      margin: { left: 10, right: 10, bottom: 16 } }, opts || {}));
+    doc._y = doc.lastAutoTable.finalY + 5;
   }
   function kvRows(pairs) {
     var rows = [];
@@ -1108,38 +1350,69 @@
     }
     return rows;
   }
-  var KV = { columnStyles: { 0: { fontStyle: 'bold', fillColor: [240, 243, 249] }, 2: { fontStyle: 'bold', fillColor: [240, 243, 249] } } };
+  var KV = { columnStyles: { 0: { fontStyle: 'bold', fillColor: [240, 243, 249], cellWidth: 32 }, 1: { cellWidth: 'auto' }, 2: { fontStyle: 'bold', fillColor: [240, 243, 249], cellWidth: 32 }, 3: { cellWidth: 'auto' } } };
 
+  /* shutdown / secured or handover statement: bold, in a highlighted box */
   function endPdf(doc, e) {
     var t = endStatement(e); if (!t) return;
-    secTitle(doc, e.type === 'sd' ? 'Shutdown / Secured' : 'Handover');
-    doc.setFontSize(10);
-    var lines = doc.splitTextToSize(t, doc.internal.pageSize.getWidth() - 20), h = lines.length * 5 + 4;
-    if (doc._y + h > doc.internal.pageSize.getHeight() - 12) { doc.addPage(); doc._y = 12; }
-    doc.text(lines, 10, doc._y + 3);
-    doc._y += h + 2;
+    var pw = doc.internal.pageSize.getWidth(), ph = doc.internal.pageSize.getHeight();
+    var heading = e.type === 'sd' ? 'SHUTDOWN / SECURED STATEMENT' : 'HANDOVER STATEMENT';
+    secTitle(doc, heading);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+    var lines = doc.splitTextToSize(t.toUpperCase(), pw - 20 - 10), h = lines.length * 5.6 + 9;
+    if (doc._y + h > ph - 16) { doc.addPage(); doc._y = 14; }
+    var y0 = doc._y;
+    doc.setFillColor(238, 243, 255); doc.rect(10, y0, pw - 20, h, 'F');
+    doc.setDrawColor(29, 78, 216); doc.setLineWidth(0.5); doc.rect(10, y0, pw - 20, h, 'S');
+    doc.setFillColor(29, 78, 216); doc.rect(10, y0, 2.2, h, 'F');
+    doc.setTextColor(0, 0, 0); doc.text(lines, 16, y0 + 8);
+    doc.setFont('helvetica', 'normal'); doc._y = y0 + h + 6;
   }
-  function trainPdf(r) {
-    var doc = newDoc('TRAIN MOVEMENT', 'landscape');
+  function pdfFooter(doc, label) {
+    var n = doc.internal.getNumberOfPages(), pw = doc.internal.pageSize.getWidth(), ph = doc.internal.pageSize.getHeight();
+    for (var i = 1; i <= n; i++) {
+      doc.setPage(i);
+      doc.setDrawColor(200, 208, 224); doc.setLineWidth(0.2); doc.line(10, ph - 11, pw - 10, ph - 11);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(110, 110, 110);
+      doc.text(label, 10, ph - 6.5); doc.text('Page ' + i + ' of ' + n, pw - 10, ph - 6.5, { align: 'right' });
+    }
+    doc.setTextColor(0, 0, 0);
+  }
+  async function trainPdf(r) {
+    var doc = newDoc('TRAIN MOVEMENT', 'portrait', 'Date: ' + S(r.date) + '   |   Train: ' + S(r.train) + '   |   Loco: ' + S(r.loco) + '   |   LP: ' + S(r.lp_name));
     tbl(doc, 'Journey', null, kvRows([['Date', r.date], ['Sign On', r.signon], ['Train', r.train], ['BPC', r.bpc],
-      ['Authority', r.authority], ['Form No.', r.formno], ['Route', r.route], ['Line No.', r.line]]), KV);
-    tbl(doc, 'BFT / BPT', null, kvRows([['BFT initial speed', KM(bi(r))], ['BFT final speed', KM(r.bftfinal)], ['BFT time', r.bfttime], ['BPT initial speed', KM(r.bptinit)], ['BPT final speed', KM(r.bptfinal)], ['BPT time', r.bpttime]]), KV);
+      ['Authority', r.authority], ['No.', r.formno]].concat((r.xa || []).reduce(function (acc, x, i) { return acc.concat([['Authority ' + (i + 2), x.name], ['No.', x.no]]); }, [])).concat([['Route', r.route], ['Line No.', r.line]])), KV);
     tbl(doc, 'Crew', ['Role', 'Name', 'CUG', 'ID'], [['LP', S(r.lp_name), S(r.lp_cug), S(r.lp_id)],
-      ['ALP', S(r.alp_name), S(r.alp_cug), S(r.alp_id)], ['TM', S(r.tm_name), S(r.tm_cug), S(r.tm_id)]]);
+      ['ALP', S(r.alp_name), S(r.alp_cug), S(r.alp_id)], ['TM', S(r.tm_name), S(r.tm_cug), S(r.tm_id)]],
+      { columnStyles: { 0: { fontStyle: 'bold', cellWidth: 20 } } });
     tbl(doc, 'Loco', null, kvRows([['Loco No.', r.loco], ['Shed', r.shed], ['Schedule Done', sch(r, 'sdone')], ['Schedule Due', sch(r, 'sdue')], ['CTO', r.cto]]), KV);
-    if (r.authority === 'T806') {
+    if (r.bftI || r.bftF || r.bftT || r.bptI || r.bptF || r.bptT) {
+      tbl(doc, 'Brake tests', ['Test', 'Initial Speed', 'Final Speed', 'Time'],
+        [['BFT', K(r.bftI), K(r.bftF), S(r.bftT)], ['BPT', K(r.bptI), K(r.bptF), S(r.bptT)]],
+        { columnStyles: { 0: { fontStyle: 'bold', cellWidth: 20 } } });
+    }
+    if (hasT806(r)) {
       tbl(doc, 'T806', null, kvRows([['Start Time', r.t8start], ['End Time', r.t8end], ['Diff', r.t8diff]]), KV);
       if ((r.blocks || []).length) tbl(doc, 'Block Back / Block Forward', ['Type', 'Station', 'No.'], r.blocks.map(function (b) { return [S(b.type), S(b.st), S(b.no)]; }));
     }
-    if (r.stations && r.stations.length) {
-      tbl(doc, 'Stations', ['#', 'Station', 'ARR', 'DEP', 'Home ARR', 'Home DEP', 'Home Diff', 'Home Late Off (km/h)', 'Starter Late Off (km/h)', 'Type', 'Time 1', 'Time 2', 'T2 - T1'],
-        r.stations.map(function (x, i) {
-          return [i + 1, S(x.name), S(x.arr), S(x.dep), S(x.hArr), S(x.hDep), S(diffTxt(x.hArr, x.hDep)), KM(x.hLate), KM(x.sLate), S(x.cType), S(x.t1), S(x.t2), S(diffTxt(x.t1, x.t2))];
-        }), { styles: { fontSize: 7.5, cellPadding: 1.2 } });
+    var sts = r.stations || [];
+    if (sts.length) {
+      tbl(doc, 'Stations', ['#', 'Station', 'ARR', 'DEP'],
+        sts.map(function (x, i) { return [i + 1, S(x.name), S(x.arr), S(x.dep)]; }),
+        { columnStyles: { 0: { cellWidth: 12 }, 2: { cellWidth: 32 }, 3: { cellWidth: 32 } } });
+      var det = sts.filter(function (x) { return x.hArr || x.hDep || x.hLate || x.sLate || x.t1 || x.t2; });
+      if (det.length) {
+        tbl(doc, 'Detention details', ['Station', 'Home ARR', 'Home DEP', 'Home Diff', 'Home Late Off', 'Starter Late Off', 'Type', 'Time 1', 'Time 2', 'T2 - T1'],
+          det.map(function (x) {
+            return [S(x.name), S(x.hArr), S(x.hDep), S(diffTxt(x.hArr, x.hDep)), K(x.hLate), K(x.sLate), S(x.cType), S(x.t1), S(x.t2), S(diffTxt(x.t1, x.t2))];
+          }), { styles: { fontSize: 7.5, cellPadding: 1.5 } });
+      }
     }
     tbl(doc, 'Fuel', null, kvRows([['Fuel T/O', r.fto], ['Fuel H/O', r.fho], ['Consumption', r.cons]]), KV);
     endPdf(doc, r.end);
-    return Promise.resolve(doc);
+    await pdfPhotos(doc, 'Shutdown / Secured photos', r.end && r.end.photos);
+    pdfFooter(doc, 'Train Movement  |  ' + S(r.date) + '  |  Train ' + S(r.train) + '  |  Loco ' + S(r.loco));
+    return doc;
   }
 
   function imgDims(d) {
@@ -1159,7 +1432,7 @@
       var dm = await imgDims(arr[i]); if (!dm) continue;
       var w = cw, h = w * dm.h / dm.w;
       if (h > 90) { h = 90; w = h * dm.w / dm.h; }
-      if (doc._y + h > ph - 12) { doc.addPage(); doc._y = 12; x = 10; rowH = 0; }
+      if (doc._y + h > ph - 16) { doc.addPage(); doc._y = 14; x = 10; rowH = 0; }
       doc.addImage(arr[i], 'JPEG', x, doc._y, w, h);
       if (x === 10) { x = 10 + cw + 6; rowH = Math.max(rowH, h); }
       else { x = 10; doc._y += Math.max(rowH, h) + 4; rowH = 0; }
@@ -1167,7 +1440,7 @@
     if (x !== 10) doc._y += rowH + 4;
   }
   async function shuntPdf(r) {
-    var doc = newDoc('SHUNTING MOVEMENT', 'portrait');
+    var doc = newDoc('SHUNTING MOVEMENT', 'portrait', 'Date: ' + S(r.date) + '   |   Shift: ' + S(r.shift) + '   |   Train: ' + S(r.train) + '   |   Loco: ' + S(r.loco));
     var duty = [['Date', r.date], ['Shift', r.shift], ['Sign On', r.signon], ['Shunting Master', r.master], ['Pointsman 1', r.pm1], ['Pointsman 2', r.pm2]]
       .concat((r.extra || []).reduce(function (acc, x, i) {
         var sx = (x && typeof x === 'object') ? x : { master: '', pm1: String(x || ''), pm2: '' };
@@ -1176,182 +1449,49 @@
     tbl(doc, 'Duty', null, kvRows(duty), KV);
     tbl(doc, 'Loco', null, kvRows([['Train', r.train], ['Loco No.', r.loco], ['Shed', r.shed], ['Schedule Done', sch(r, 'sdone')], ['Schedule Due', sch(r, 'sdue')]]), KV);
     if (r.mv && r.mv.length) tbl(doc, 'Movement', ['#', 'Line / SH', 'ARR', 'Line / SH', 'DEP', 'Remark'],
-      r.mv.map(function (m, i) { return [i + 1, S(m.l1), S(m.arr), S(m.l2), S(m.dep), S(m.rmk)]; }));
+      r.mv.map(function (m, i) { return [i + 1, S(m.l1), S(m.arr), S(m.l2), S(m.dep), S(m.remark)]; }));
     endPdf(doc, r.end);
+    await pdfPhotos(doc, 'Shutdown / Secured photos', r.end && r.end.photos);
     await pdfPhotos(doc, 'Movement photos', r.mPhotos);
+    pdfFooter(doc, 'Shunting Movement  |  ' + S(r.date) + '  |  Train ' + S(r.train) + '  |  Loco ' + S(r.loco));
     return doc;
   }
 
-  /* ---------- toast, file saving (works inside the Claude viewer and as a normal page) ---------- */
-  var toastT = null;
-  function toast(msg, kind) {
-    var t = $('toast'); t.textContent = msg; t.className = 'show ' + (kind || '');
-    clearTimeout(toastT); toastT = setTimeout(function () { t.className = ''; }, 6000);
-  }
-  var dlP = null;
-  function getDL() {
-    if (!dlP) dlP = (async function () {
-      try { return (window.claude && window.claude.use) ? await window.claude.use('downloads') : null; } catch (e) { return null; }
-    })();
-    return dlP;
-  }
-  async function saveBlob(blob, name) {
-    var dl = await getDL();
-    if (dl) {
-      try { await dl.save({ filename: name, data: blob }); return 'saved'; }
-      catch (e) { if (e && e.code === 'declined') return 'declined'; throw new Error((e && e.message) || 'Save is not available here'); }
-    }
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
-    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
-    return 'saved';
-  }
-  async function saveWb(wb, name) {
-    try {
-      if (!window.XLSX) throw new Error('Excel library could not load. Connect to the internet and reload.');
-      var out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-      var r = await saveBlob(new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), name);
-      if (r === 'saved') toast('Excel file ready: ' + name, 'ok');
-    } catch (e) { toast('Could not save Excel: ' + (e && e.message ? e.message : e), 'err'); }
-  }
-
-  /* ---------- plain-text and on-screen versions of a saved log ---------- */
-  function rec(kind, i) { return kind === 'train' ? trains[i] : shunts[i]; }
-  function recordText(kind, r) {
-    var L = [], v = function (x) { return (x == null || x === '') ? '-' : x; };
-    if (kind === 'train') {
-      L.push('*TRAIN MOVEMENT* ' + v(r.date));
-      L.push('Train: ' + v(r.train) + ' | Loco: ' + v(r.loco) + ' | Shed: ' + v(r.shed));
-      L.push('Sign on: ' + v(r.signon) + ' | BPC: ' + v(r.bpc) + ' | Authority: ' + v(r.authority) + (r.formno ? ' (No. ' + r.formno + ')' : '') + ' | Route: ' + v(r.route));
-      L.push('LP: ' + v(r.lp_name) + ' (CUG ' + v(r.lp_cug) + ', ID ' + v(r.lp_id) + ')');
-      if (r.alp_name) L.push('ALP: ' + r.alp_name + ' (CUG ' + v(r.alp_cug) + ', ID ' + v(r.alp_id) + ')');
-      if (r.tm_name) L.push('TM: ' + r.tm_name + ' (CUG ' + v(r.tm_cug) + ', ID ' + v(r.tm_id) + ')');
-      L.push('BFT: ' + v(bi(r)) + ' to ' + v(r.bftfinal) + ' km/h at ' + v(r.bfttime) + ' | BPT: ' + v(r.bptinit) + ' to ' + v(r.bptfinal) + ' km/h at ' + v(r.bpttime));
-      L.push('Schedule done: ' + v(sch(r, 'sdone')) + ' | due: ' + v(sch(r, 'sdue')) + ' | CTO: ' + v(r.cto) + ' | Line: ' + v(r.line));
-      if (r.authority === 'T806') {
-        L.push('T806: ' + v(r.t8start) + ' to ' + v(r.t8end) + (r.t8diff ? ' (' + r.t8diff + ')' : ''));
-        (r.blocks || []).forEach(function (b) { L.push(b.type + ': ' + v(b.st) + ' (' + v(b.no) + ')'); });
-      }
-      if ((r.stations || []).length) {
-        L.push('*Stations*');
-        r.stations.forEach(function (x, n) {
-          var t = (n + 1) + '. ' + v(x.name) + ' ARR ' + v(x.arr) + ' DEP ' + v(x.dep);
-          if (x.hArr || x.hDep) t += ' | Home ' + v(x.hArr) + '-' + v(x.hDep) + (diffTxt(x.hArr, x.hDep) ? ' (' + diffTxt(x.hArr, x.hDep) + ')' : '');
-          if (x.hLate) t += ' | Home late off ' + x.hLate + ' km/h';
-          if (x.sLate) t += ' | Starter late off ' + x.sLate + ' km/h';
-          if (x.t1 || x.t2) t += ' | ' + x.cType + ' ' + v(x.t1) + '-' + v(x.t2) + (diffTxt(x.t1, x.t2) ? ' (' + diffTxt(x.t1, x.t2) + ')' : '');
-          L.push(t);
-        });
-      }
-      L.push('Fuel T/O: ' + v(r.fto) + ' | H/O: ' + v(r.fho) + ' | Consumption: ' + v(r.cons));
-    } else {
-      L.push('*SHUNTING MOVEMENT* ' + v(r.date) + ' | Shift ' + v(r.shift) + ' | Sign on ' + v(r.signon));
-      L.push('Shunting master: ' + v(r.master) + ' | Pointsman 1: ' + v(r.pm1) + ' | Pointsman 2: ' + v(r.pm2));
-      setsTxt(r).forEach(function (t) { L.push(t); });
-      L.push('Train: ' + v(r.train) + ' | Loco: ' + v(r.loco) + ' | Shed: ' + v(r.shed));
-      L.push('Schedule done: ' + v(sch(r, 'sdone')) + ' | due: ' + v(sch(r, 'sdue')));
-      if ((r.mv || []).length) {
-        L.push('*Movement*');
-        r.mv.forEach(function (m, n) { L.push((n + 1) + '. ' + v(m.l1) + ' ARR ' + v(m.arr) + ' > ' + v(m.l2) + ' DEP ' + v(m.dep) + (m.rmk ? ' | ' + m.rmk : '')); });
-      }
-    }
-    var e = endStatement(r.end); if (e) { L.push('*' + (r.end.type === 'sd' ? 'Shutdown / Secured' : 'Handover') + '*'); L.push(e); }
-    var t = L.join('\n');
-    return t.length > 3500 ? t.slice(0, 3450) + '\n... (full details in the PDF)' : t;
-  }
-  function vKV(rows) { return '<table class="vkv">' + rows.map(function (x) { return '<tr><th>' + esc(x[0]) + '</th><td>' + esc(S(x[1])) + '</td></tr>'; }).join('') + '</table>'; }
-  function vTbl(head, rows) {
-    return '<div class="wrap"><table><thead><tr>' + head.map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('') + '</tr></thead><tbody>' +
-      rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + esc(S(c)) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>';
-  }
-  function recordHtml(kind, r) {
-    var h = '';
-    if (kind === 'train') {
-      h += '<div class="vsec">Journey</div>' + vKV([['Date', r.date], ['Sign On', r.signon], ['Train', r.train], ['BPC', r.bpc], ['Authority', r.authority], ['Form No.', r.formno], ['Route', r.route], ['Line No.', r.line]]);
-      h += '<div class="vsec">BFT / BPT</div>' + vKV([['BFT initial speed', KM(bi(r))], ['BFT final speed', KM(r.bftfinal)], ['BFT time', r.bfttime], ['BPT initial speed', KM(r.bptinit)], ['BPT final speed', KM(r.bptfinal)], ['BPT time', r.bpttime]]);
-      h += '<div class="vsec">Crew</div>' + vTbl(['Role', 'Name', 'CUG', 'ID'], [['LP', r.lp_name, r.lp_cug, r.lp_id], ['ALP', r.alp_name, r.alp_cug, r.alp_id], ['TM', r.tm_name, r.tm_cug, r.tm_id]]);
-      h += '<div class="vsec">Loco</div>' + vKV([['Loco No.', r.loco], ['Shed', r.shed], ['Schedule Done', sch(r, 'sdone')], ['Schedule Due', sch(r, 'sdue')], ['CTO', r.cto]]);
-      if (r.authority === 'T806') {
-        h += '<div class="vsec">T806</div>' + vKV([['Start Time', r.t8start], ['End Time', r.t8end], ['Diff', r.t8diff]]);
-        if ((r.blocks || []).length) h += vTbl(['Type', 'Station', 'No.'], r.blocks.map(function (b) { return [b.type, b.st, b.no]; }));
-      }
-      if ((r.stations || []).length) h += '<div class="vsec">Stations</div>' + vTbl(['#', 'Station', 'ARR', 'DEP', 'Home ARR', 'Home DEP', 'Home Diff', 'Home Late Off (km/h)', 'Starter Late Off (km/h)', 'Type', 'Time 1', 'Time 2', 'T2 - T1'],
-        r.stations.map(function (x, n) { return [n + 1, x.name, x.arr, x.dep, x.hArr, x.hDep, diffTxt(x.hArr, x.hDep), KM(x.hLate), KM(x.sLate), x.cType, x.t1, x.t2, diffTxt(x.t1, x.t2)]; }));
-      h += '<div class="vsec">Fuel</div>' + vKV([['Fuel T/O', r.fto], ['Fuel H/O', r.fho], ['Consumption', r.cons]]);
-    } else {
-      var duty = [['Date', r.date], ['Shift', r.shift], ['Sign On', r.signon], ['Shunting Master', r.master], ['Pointsman 1', r.pm1], ['Pointsman 2', r.pm2]];
-      setsTxt(r).forEach(function (t) { duty.push(['Additional staff', t]); });
-      h += '<div class="vsec">Duty</div>' + vKV(duty);
-      h += '<div class="vsec">Loco</div>' + vKV([['Train', r.train], ['Loco No.', r.loco], ['Shed', r.shed], ['Schedule Done', sch(r, 'sdone')], ['Schedule Due', sch(r, 'sdue')]]);
-      if ((r.mv || []).length) h += '<div class="vsec">Movement</div>' + vTbl(['#', 'Line / SH', 'ARR', 'Line / SH', 'DEP', 'Remark'], r.mv.map(function (m, n) { return [n + 1, m.l1, m.arr, m.l2, m.dep, m.rmk]; }));
-    }
-    var e = endStatement(r.end);
-    if (e) h += '<div class="vsec">' + (r.end.type === 'sd' ? 'Shutdown / Secured' : 'Handover') + '</div><div class="vstmt">' + esc(e) + '</div>';
-    if (kind === 'shunt' && (r.mPhotos || []).length) h += '<div class="vsec">Movement photos</div><div class="thumbs">' + r.mPhotos.map(function (d) { return '<div class="thumb"><img src="' + d + '" alt="photo"></div>'; }).join('') + '</div>';
-    return h;
-  }
-
-  /* ---------- View a saved log ---------- */
-  var viewCur = null;
-  function openView(kind, i) {
-    var r = rec(kind, i); if (!r) return;
-    viewCur = { kind: kind, i: i };
-    $('viewTitle').textContent = (kind === 'train' ? 'Train Movement' : 'Shunting Movement') + ' - ' + S(r.date) + (r.train ? ' - ' + r.train : '') + (r.loco ? ' - Loco ' + r.loco : '');
-    $('viewBody').innerHTML = recordHtml(kind, r);
-    $('vWa').href = 'https://wa.me/?text=' + encodeURIComponent(recordText(kind, r));
-    $('viewBox').classList.add('on');
-    $('viewBox').scrollTop = 0;
-  }
-  function closeView() { $('viewBox').classList.remove('on'); viewCur = null; }
-  $('viewClose').addEventListener('click', closeView);
-  $('viewBox').addEventListener('click', function (e) { if (e.target === $('viewBox')) closeView(); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && viewCur) closeView(); });
-  $('vShare').addEventListener('click', function () { if (viewCur) shareRecord(viewCur.kind, viewCur.i); });
-  $('vPdf').addEventListener('click', function () { if (viewCur) downloadPdf(viewCur.kind, viewCur.i); });
-  $('vCopy').addEventListener('click', async function () {
-    if (!viewCur) return;
-    var t = recordText(viewCur.kind, rec(viewCur.kind, viewCur.i));
-    try { await navigator.clipboard.writeText(t); toast('Copied. Paste it in WhatsApp.', 'ok'); return; } catch (e) {}
-    try {
-      var ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select(); var ok = document.execCommand('copy'); ta.remove();
-      toast(ok ? 'Copied. Paste it in WhatsApp.' : 'Could not copy. Use "Send text on WhatsApp" instead.', ok ? 'ok' : 'err');
-    } catch (e) { toast('Could not copy. Use "Send text on WhatsApp" instead.', 'err'); }
-  });
-
-  /* ---------- PDF: build, share (WhatsApp), download ---------- */
-  async function makePdf(kind, i) {
-    if (!window.jspdf || !window.jspdf.jsPDF) throw new Error('PDF library could not load. Connect to the internet and reload the page.');
-    var r = rec(kind, i); if (!r) throw new Error('Record not found.');
-    var doc = kind === 'train' ? await trainPdf(r) : await shuntPdf(r);
-    var base = (kind === 'train' ? 'TRAIN_' : 'SHUNTING_') + String(r.train || r.loco || 'RECORD') + '_' + (r.date || '');
-    return { blob: doc.output('blob'), name: base.replace(/[^A-Za-z0-9_-]+/g, '_') + '.pdf', text: recordText(kind, r) };
-  }
   var sharing = false;
   async function shareRecord(kind, i) {
+    var msgId = kind === 'train' ? 'trainMsg' : 'shuntMsg';
     if (sharing) return;
-    sharing = true; toast('Preparing PDF…');
+    if (!window.jspdf || !window.jspdf.jsPDF) { setMsg(msgId, 'PDF library could not load. Connect to the internet and reload the page.', 'err'); return; }
+    var r = kind === 'train' ? trains[i] : shunts[i]; if (!r) return;
+    sharing = true; setMsg(msgId, 'Preparing PDF…');
     try {
-      var f = await makePdf(kind, i);
-      var file = new File([f.blob], f.name, { type: 'application/pdf' });
+      var doc = kind === 'train' ? await trainPdf(r) : await shuntPdf(r);
+      var base = (kind === 'train' ? 'TRAIN_' : 'SHUNTING_') + String(r.train || r.loco || 'RECORD') + '_' + (r.date || '');
+      var name = base.replace(/[^A-Za-z0-9_-]+/g, '_') + '.pdf';
+      var blob = doc.output('blob');
+      var text = (kind === 'train' ? 'TRAIN MOVEMENT' : 'SHUNTING MOVEMENT') + ' - ' + S(r.date) +
+        (r.train ? ' - TRAIN ' + r.train : '') + (r.loco ? ' - LOCO ' + r.loco : '') +
+        (kind === 'train' ? (r.lp_name ? ' - LP ' + r.lp_name : '') : (r.master ? ' - SM ' + r.master : ''));
+      var file = new File([blob], name, { type: 'application/pdf' });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         try {
-          await navigator.share({ files: [file], title: f.name, text: f.text.slice(0, 200) });
-          toast('Shared. Pick WhatsApp in the share sheet.', 'ok'); sharing = false; return;
+          await navigator.share({ files: [file], title: name, text: text });
+          setMsg(msgId, 'Shared. Choose WhatsApp in the share sheet next time too.', 'ok');
+          sharing = false; return;
         } catch (e) {
-          if (e && e.name === 'AbortError') { toast('Share cancelled.'); sharing = false; return; }
+          if (e && e.name === 'AbortError') { setMsg(msgId, ''); sharing = false; return; }
         }
       }
-      var r = await saveBlob(f.blob, f.name);            // viewer save / share sheet, or normal download
-      toast(r === 'saved' ? 'PDF ready (' + f.name + '). Attach it in WhatsApp, or use "Send text on WhatsApp" in View.' : 'Cancelled.', r === 'saved' ? 'ok' : '');
-    } catch (e) { toast('Could not share: ' + (e && e.message ? e.message : e), 'err'); }
+      // fallback: download the PDF, open WhatsApp with a text summary
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+      window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+      setMsg(msgId, 'PDF downloaded (' + name + '). In WhatsApp, attach this file to send it.', 'ok');
+    } catch (e) {
+      setMsg(msgId, 'Could not create the PDF: ' + (e && e.message ? e.message : e), 'err');
+    }
     sharing = false;
-  }
-  async function downloadPdf(kind, i) {
-    try {
-      var f = await makePdf(kind, i), r = await saveBlob(f.blob, f.name);
-      if (r === 'saved') toast('PDF ready: ' + f.name, 'ok');
-    } catch (e) { toast('Could not create the PDF: ' + (e && e.message ? e.message : e), 'err'); }
   }
 
   /* ---------- Schedule Due auto-calculation: Schedule Done date + days of the Due type (TI 45, IA 90, IB 180, IC 270) ---------- */
@@ -1386,40 +1526,14 @@
     var b = e.target.closest('[data-duecalc]'); if (b) dueCalc(b.getAttribute('data-duecalc'), true);
   });
 
-  /* ---------- every time box gets a "Now" (autofill) button ---------- */
-  function addNowButtons(root) {
-    (root || document).querySelectorAll('input[type=time]:not([data-nb])').forEach(function (inp) {
-      inp.setAttribute('data-nb', '1');
-      var par = inp.parentElement;
-      if (par && par.classList.contains('tcell')) {                       // already has its own Now button
-        if (par.querySelector('button')) return;
-        var b0 = document.createElement('button'); b0.type = 'button'; b0.className = 'btn alt sm'; b0.setAttribute('data-timenow', '1'); b0.textContent = 'Now';
-        par.appendChild(b0); return;
-      }
-      var wrap = document.createElement('div'); wrap.className = 'tcell';
-      inp.parentNode.insertBefore(wrap, inp); wrap.appendChild(inp);
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'btn alt sm'; b.setAttribute('data-timenow', '1'); b.textContent = 'Now';
-      wrap.appendChild(b);
-    });
-  }
-  document.addEventListener('click', function (e) {
-    var b = e.target.closest('[data-timenow]'); if (!b) return;
-    var inp = b.parentElement.querySelector('input[type=time]'); if (!inp) return;
-    inp.value = nowHM();
-    inp.dispatchEvent(new Event('input', { bubbles: true }));
-    inp.dispatchEvent(new Event('change', { bubbles: true }));
-  });
-  new MutationObserver(function () { addNowButtons(); }).observe(document.body, { childList: true, subtree: true });
-  addNowButtons();
-
   /* ---------- auto-save every field as you type (refresh / crash / close safe) ---------- */
   var DRAFT_KEY = 'draft_v1', saveTimer = null;
 
   function collectDraft() {
-    var d = { view: curView, train: {}, shunt: {}, route: {}, staff: {} }, t = d.train, h = d.shunt;
+    var d = { view: curView, train: {}, shunt: {}, route: {}, staff: {}, editT: editT, editS: editS }, t = d.train, h = d.shunt;
     TF.forEach(function (f) { t[f] = $('t_' + f).value; });
     P.forEach(function (p) { ['name', 'cug', 'id'].forEach(function (k) { t[p[0] + '_' + k] = $(p[0] + '_' + k).value; }); });
-    t.auth = $('t_auth').value; t.authOther = $('t_authOther').value; t.route = $('t_route').value;
+    t.xa = xa; t.auth = $('t_auth').value; t.authOther = $('t_authOther').value; t.route = $('t_route').value;
     t.st = st; t.blocks = blocks;
     SFLD.forEach(function (f) { h[f] = $('s_' + f).value; });
     h.end = endGet('se'); t.end = endGet('te');
@@ -1432,7 +1546,7 @@
     clearTimeout(saveTimer); saveTimer = null;
     var d = collectDraft();
     if (!store(DRAFT_KEY, d)) {                       // storage full: keep the text, drop the photos
-      d.shunt.mPhotos = [];
+      d.shunt.mPhotos = []; if (d.shunt.end) d.shunt.end.photos = []; if (d.train.end) d.train.end.photos = [];
       if (!store(DRAFT_KEY, d)) { $('saveStat').textContent = 'Auto-save failed (storage full)'; return; }
     }
     $('saveStat').textContent = '✓ Auto-saved ' + nowHM();
@@ -1447,7 +1561,7 @@
     if (t.auth) $('t_auth').value = t.auth;
     $('t_authOther').value = t.authOther || '';
     $('authOtherBox').classList.toggle('hidden', $('t_auth').value !== 'Other');
-    $('t806Box').classList.toggle('hidden', $('t_auth').value !== 'T806');
+    xa = (t.xa || []).slice(); renderXA();
     refreshRouteSelect(); $('t_route').value = t.route || '';
     st = t.st || []; renderStations();
     if (t.blocks && t.blocks.length) { blocks = t.blocks; renderBlk(); }
@@ -1464,6 +1578,8 @@
     var r = d.route || {}; $('r_name').value = r.name || ''; $('r_stations').value = r.stations || '';
     var f = d.staff || {}; $('ss_name').value = f.name || ''; $('ss_cug').value = f.cug || ''; $('ss_id').value = f.id || ''; $('ss_desig').value = f.desig || '';
 
+    if (d.editT && trains.some(function (x) { return x.id === d.editT; })) setEditT(d.editT);
+    if (d.editS && shunts.some(function (x) { return x.id === d.editS; })) setEditS(d.editS);
     if (d.view && d.view !== 'home' && $('v-' + d.view)) show(d.view);
     $('saveStat').textContent = '✓ Draft restored';
   }
